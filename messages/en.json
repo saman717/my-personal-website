@@ -1,0 +1,50 @@
+{
+  "header": {
+    "home": "Home",
+    "about": "About",
+    "services": "Services",
+    "portfolio": "Portfolio",
+    "blog": "Blog",
+    "contact": "Contact",
+    "appointment": "Appointment",
+    "download_resume": "Download Resume"
+  },
+  "home": {
+    "title": "Hi, I'm Saman Khoshnood",
+    "subtitle": "Full Stack Developer",
+    "description": "I code, design, and automate.\nSpecialist in creating modern web experiences",
+    "cta_projects": "View Projects",
+    "cta_contact": "Contact Me"
+  },
+  "skills": {
+    "title": "My Skills",
+    "frontend": "Frontend",
+    "backend": "Backend",
+    "design": "Design",
+    "other": "Other",
+    "progress_level": {
+      "learning": "Learning",
+      "proficient": "Proficient",
+      "expert": "Expert"
+    }
+  },
+  "projects": {
+    "title": "My Projects",
+    "view_more": "View More",
+    "view_project": "View Project",
+    "items": [
+      {
+        "title": "Smart Telegram Bot",
+        "description": "Task management bot with admin panel and reporting"
+      },
+      {
+        "title": "Modern E-commerce Site",
+        "description": "Online store with integrated payment and advanced admin panel"
+      },
+      {
+        "title": "Management Dashboard",
+        "description": "Comprehensive admin panel with interactive charts and real-time reporting"
+      }
+    ]
+  }
+}
