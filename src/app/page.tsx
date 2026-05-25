@@ -1,6 +1,6 @@
-import HeroSection from '@/components/home/HeroSection';
+import { redirect } from 'next/navigation';
 
-export default async function HomePage({ params }: { params: { locale: string } }) {
-  const { locale } = await params;
-
-  return <HeroSection locale={locale} />;}
+export default function RootPage() {
+  // کاربر به محض ورود به آدرس اصلی، به پوشه لوکال منتقل می‌شود
+  redirect('/fa'); 
+}
