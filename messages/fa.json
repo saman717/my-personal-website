@@ -45,5 +45,18 @@
         "title": "داشبورد مدیریت",
         "description": "پنل مدیریت جامع با نمودارهای تعاملی و گزارش‌گیری لحظه‌ای"
       }
-    ]}
+    ]
+  },
+  "timeline": {
+    "title": "مسیر حرفه‌ای",
+    "item_1_year": "۱۴۰۲",
+    "item_1_title": "شروع ماجرا",
+    "item_1_tech": "HTML • CSS • Tailwind • wordpress",
+    "item_2_year": "۱۴۰۳",
+    "item_2_title": "قدم به دنیای تعامل",
+    "item_2_tech": "JavaScript • Template Design • vue3.js",
+    "item_3_year": "۱۴۰۴",
+    "item_3_title": "گسترش مهارت‌ها",
+    "item_3_tech": "React • Node.js • PLC (delta)"
+  }
 }

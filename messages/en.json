@@ -46,5 +46,18 @@
         "description": "Comprehensive admin panel with interactive charts and real-time reporting"
       }
     ]
+  },
+  
+  "timeline": {
+    "title": "Professional Path",
+    "item_1_year": "2023",
+    "item_1_title": "The Beginning",
+    "item_1_tech": "HTML • CSS • Tailwind • WordPress",
+    "item_2_year": "2024",
+    "item_2_title": "Entering Interaction",
+    "item_2_tech": "JavaScript • Template Design • Vue3.js",
+    "item_3_year": "2025",
+    "item_3_title": "Expanding Skills",
+    "item_3_tech": "React • Node.js • PLC (Delta)"
   }
 }
