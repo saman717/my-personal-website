@@ -1,106 +1,62 @@
-"use client";
+import React from 'react';
+import { motion, MotionValue } from 'framer-motion';
 
-import { motion, useTransform } from "framer-motion";
-import WPLSoft from "@/WPLSoft"
-
-interface TimelineItemProps {
-    year: string;
-    title: string;
-    description: string;
-    icon: React.ReactNode;
-    iconColor: string;
-    position: "left" | "right";
-    dotTopPercent: number;
-    dotLeftPercent: number;
-    cardOffsetX: number;
-    cardOffsetY: number;
-    yearOffsetX: number;
-    yearOffsetY: number;
-    // پراپ‌های جدید برای هماهنگی با اسکرول
-    scrollYProgress: any;
-    range: [number, number];
+interface TimelineItemType {
+  id: number;
+  year: string;
+  title: string;
+  tech: string;
+  cardX: number;
+  cardY: number;
+  cardWidth: number;
+  cardHeight: number;
+  dotX: number;
+  dotY: number;
+  yearX: number;
+  yearY: number;
+  icon: React.ReactNode;
 }
 
-export default function TimelineItem({
-    year,
-    title,
-    description,
-    icon,
-    iconColor,
-    position,
-    dotTopPercent,
-    dotLeftPercent,
-    cardOffsetX,
-    cardOffsetY,
-    yearOffsetX,
-    yearOffsetY,
-    scrollYProgress,
-    range,
-}: TimelineItemProps) {
-    // محاسبه opacity و scale بر اساس پیشرفت خط
-    const opacity = useTransform(scrollYProgress, range, [0.2, 10]);
-    const scale = useTransform(scrollYProgress, range, [1, 1]);
-
-
-    return (
-        <>
-            {/* نقطه روی خط */}
-            <motion.div
-                style={{
-                    opacity,
-                    top: `${dotTopPercent}%`,
-                    left: `${dotLeftPercent}%`,
-                    transform: "translate(-50%, -50%)"
-                }}
-                className="absolute z-10 w-3 h-3 bg-[#7c3aed] rounded-full shadow-[0_0_15px_rgba(124,58,237,0.6)]"
-            />
-
-            {/* کارت اطلاعات */}
-            <motion.div
-                style={{
-                    opacity,
-                    scale,
-                    top: `${dotTopPercent + cardOffsetY}%`,
-                    left: `${dotLeftPercent + cardOffsetX}%`,
-                    transform: "translate(-50%, -50%)"
-                }}
-                className="absolute z-20 w-64 md:w-72 bg-[#1E1E24] rounded-xl p-5 border border-white/5 hover:border-white/10 transition-all shadow-xl"
-            >
-                {/* آیکون */}
-                <div
-                    className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3"
-                    style={{ backgroundColor: iconColor }}
-                >
-                    {icon}
-                </div>
-
-                {/* عنوان */}
-                <h3 className="text-white text-center text-lg font-bold mb-1">{title}</h3>
-
-                {/* توضیحات */}
-                <p className="text-gray-400 text-center text-sm leading-relaxed mb-3">
-                    {description}
-                </p>
-
-                {/* باکس‌های تکنولوژی */}
-                <div className="flex justify-center gap-2 text-white">
-                    <WPLSoft />
-                </div>
-            </motion.div>
-
-            {/* سال */}
-            <motion.div
-                style={{
-                    opacity,
-                    scale,
-                    top: `${dotTopPercent + yearOffsetY}%`,
-                    left: `${dotLeftPercent + yearOffsetX}%`,
-                    transform: "translate(-50%, -50%)"
-                }}
-                className="absolute z-20 bg-[#1E1E24] px-4 py-1 rounded-md border border-white/5"
-            >
-                <span className="text-white text-lg font-bold">{year}</span>
-            </motion.div>
-        </>
-    );
-}
+// ۱. لیست دیتا همراه با مختصات فیکس در باکس ۱۲۰۰ در ۱۷۱۸
+const timelineData: TimelineItemType[] = [
+  {
+    id: 1,
+    year: "1402",
+    title: "شروع ماجرا",
+    tech: "HTML • CSS • Tailwind • wordpress",
+    cardX: 60,      // موقعیت افقی کارت در کادر SVG
+    cardY: 220,     // موقعیت عمودی کارت در کادر SVG
+    cardWidth: 380,
+    cardHeight: 400,
+    dotX: 555,      // نقطه‌ی بنفش روی خط
+    dotY: 335,
+    yearX: 610,     // موقعیت باکس سال ۱۴۰۲
+    yearY: 310,
+    icon: (
+      <div className="w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center border border-red-500/20">
+        {/* آیکون پرچم تو - اینجا کدهای SVG یا تصویرش رو قرار بده */}
+        <span className="text-3xl">🚩</span>
+      </div>
+    ),
+  },
+  {
+    id: 2,
+    year: "1403",
+    title: "قدم به دنیای تعامل",
+    tech: "JavaScript • Template Design • vue3.js",
+    cardX: 740,
+    cardY: 610,
+    cardWidth: 380,
+    cardHeight: 400,
+    dotX: 345,
+    dotY: 725,
+    yearX: 230,
+    yearY: 700,
+    icon: (
+      <div className="w-20 h-20 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+        <span className="text-3xl">💻</span> {/* آیکون لپ‌تاپ UI/UX */}
+      </div>
+    ),
+  },
+  // سال ۱۴۰۴ هم به همین ترتیب اضافه می‌شود...
+];
