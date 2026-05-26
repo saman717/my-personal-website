@@ -14,7 +14,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
       <SkillsSection />
       <ProjectsSection />
       <TimelineSection />
-      <ContactSection />
+      <ContactSection locale={locale} />
     </>
   );
 }
