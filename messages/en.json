@@ -47,7 +47,6 @@
       }
     ]
   },
-  
   "timeline": {
     "title": "Professional Path",
     "item_1_year": "2023",
@@ -59,5 +58,32 @@
     "item_3_year": "2025",
     "item_3_title": "Expanding Skills",
     "item_3_tech": "React • Node.js • PLC (Delta)"
+  },
+  "contact": {
+    "title": "Contact Me",
+    "form": {
+      "fullName": "Full Name",
+      "phone": "Phone Number",
+      "email": "Email Address",
+      "message": "Message",
+      "submit": "Send Request",
+      "submitting": "Sending...",
+      "placeholders": {
+        "fullName": "Enter your name",
+        "phone": "Enter your phone",
+        "email": "Enter your email",
+        "message": "Type your message here..."
+      },
+      "errors": {
+        "fullName": "Please enter your name",
+        "phone": "Invalid phone number",
+        "email": "Invalid email format",
+        "message": "Message cannot be empty"
+      }
+    },
+    "info": {
+      "heading": "Let's work together",
+      "description": "Feel free to reach out for collaborations or just to say hi."
+    }
   }
 }

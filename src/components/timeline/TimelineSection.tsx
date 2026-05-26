@@ -2,7 +2,7 @@
 
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
-import { useTranslate } from '@/hooks/useTranslate'; // هوک کاستوم و دقیق تو
+import { useTranslate } from '@/hooks/useTranslate';
 import { geoPositions, GeoPositionItem } from '@/data/timelineData';
 
 interface RenderableTimelineItem extends GeoPositionItem {
@@ -51,12 +51,79 @@ const TimelineDesktopRow: React.FC<{ item: RenderableTimelineItem; scrollYProgre
   );
 };
 
+// کامپوننت دایره‌های انتهایی منحنی
+const EndCircles: React.FC<{ scrollYProgress: MotionValue<number> }> = ({ scrollYProgress }) => {
+  // تعریف محدوده اسکرول برای دایره‌های انتهایی
+  // از 0.8 شروع می‌شه، در 0.9 کاملاً نمایان می‌شه، تا 1 باقی می‌مونه
+  const endCirclesOpacity = useTransform(scrollYProgress, [0.75, 0.85, 0.95, 1], [0, 0.3, 0.7, 1]);
+
+  // دایره اول - خاکستری
+  const circle1Opacity = useTransform(scrollYProgress, [0.75, 0.82, 0.95, 1], [0, 0.5, 0.5, 0.5]);
+
+  // دایره دوم - خاکستری  
+  const circle2Opacity = useTransform(scrollYProgress, [0.80, 0.87, 0.95, 1], [0, 0.5, 0.5, 0.5]);
+
+  // دایره سوم - بنفش با افکت
+  const circle3Opacity = useTransform(scrollYProgress, [0.85, 0.92, 0.97, 1], [0, 0.3, 0.8, 1]);
+  const circle3Scale = useTransform(scrollYProgress, [0.85, 0.92, 0.97, 1], [0.5, 0.9, 1.05, 1]);
+  const circle3Color = useTransform(
+    scrollYProgress,
+    [0.85, 0.92, 0.97, 1],
+    ["#4b5563", "#7c3aed", "#8b5cf6", "#a78bfa"]
+  );
+  const circle3Shadow = useTransform(
+    scrollYProgress,
+    [0.85, 0.92, 0.97, 1],
+    [
+      "drop-shadow(0px 0px 0px transparent)",
+      "drop-shadow(0px 0px 4px rgba(139, 92, 246, 0.3))",
+      "drop-shadow(0px 0px 8px rgba(139, 92, 246, 0.6))",
+      "drop-shadow(0px 0px 12px rgba(139, 92, 246, 0.8))"
+    ]
+  );
+
+  return (
+    <motion.g style={{ opacity: endCirclesOpacity }}>
+      {/* دایره اول */}
+      <motion.circle
+        cx={600}
+        cy={1760}
+        r="6"
+        style={{ opacity: circle1Opacity }}
+        className="fill-gray-600"
+      />
+
+      {/* دایره دوم */}
+      <motion.circle
+        cx={600}
+        cy={1775}
+        r="6"
+        style={{ opacity: circle2Opacity }}
+        className="fill-gray-600"
+      />
+
+      {/* دایره سوم (بنفش متحرک) */}
+      <motion.circle
+        cx={600}
+        cy={1795}
+        r="8"
+        style={{
+          opacity: circle3Opacity,
+          scale: circle3Scale,
+          fill: circle3Color,
+          filter: circle3Shadow,
+        }}
+      />
+    </motion.g>
+  );
+};
+
 export default function TimelineSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  
+
   // ⚡️ استفاده از خروجی‌های هوک خودت به صورت Destructuring
   const { locale, t, mounted } = useTranslate();
-  
+
   const isRtl = locale === 'fa';
 
   // ادغام هندسه با متون لوکالایز شده از فایل‌های JSON
@@ -68,7 +135,7 @@ export default function TimelineSection() {
   }));
 
   const { scrollYProgress } = useScroll({
-    target: sectionRef,
+    target: mounted ? sectionRef : undefined,
     offset: ["start start", "end end"],
   });
 
@@ -78,19 +145,51 @@ export default function TimelineSection() {
   if (!mounted) return <div className="w-full h-96 bg-[#0d0d12]" />;
 
   return (
-    <section ref={sectionRef} className="w-full bg-[#0d0d12] py-16 md:py-20 flex flex-col items-center overflow-hidden">
-      
+    <section ref={sectionRef} className="w-full bg-[#0d0d12] py-16 md:py-20 flex flex-col items-center">
+
       {/* هدر بخش */}
-      <div className={`w-full max-w-[1200px] px-6 flex ${isRtl ? 'justify-end' : 'justify-start'}`}>
-        <h2 className={`text-3xl md:text-5xl font-bold text-white mb-12 md:mb-24 relative after:content-[''] after:absolute after:-bottom-4 after:w-24 after:h-1 after:bg-white/10 ${isRtl ? 'text-right after:right-0' : 'text-left after:left-0'}`}>
+      <div className={`w-full max-w-300 px-6 flex ${isRtl ? 'justify-center' : 'justify-center'}`}>
+        <h2 className={`
+  text-3xl md:text-5xl font-bold text-white mb-12 md:mb-24 
+  relative 
+  after:content-[''] 
+  after:absolute 
+  after:-bottom-6 
+  after:w-24 
+  after:h-1 
+  after:rounded-full
+  after:bg-white/20 
+  
+  // سایه اولیه (هاله نئونی خیلی کم)
+  after:shadow-[0_0_5px_rgba(139,92,246,0.3)]
+  
+  // انیمیشن روی همه خواص
+  after:transition-all 
+  after:duration-500 
+  after:ease-out
+  
+  ${isRtl
+            ? `text-right after:right-0 
+       hover:after:-translate-x-45 
+       hover:after:w-12 
+       hover:after:bg-[#8b5cf6] 
+       // افکت نئون قوی‌تر در هاور
+       hover:after:shadow-[0_0_10px_#8b5cf6,0_0_20px_#8b5cf6,0_0_45px_#8b5cf6]`
+            : `text-left after:left-0 
+       hover:after:translate-x-45 
+       hover:after:w-12 
+       hover:after:bg-[#8b5cf6] 
+       hover:after:shadow-[0_0_15px_#8b5cf6,0_0_30px_#8b5cf6,0_0_45px_#8b5cf6]`
+          }
+`}>
           {t('timeline.title')}
         </h2>
       </div>
 
-      <div className="w-full max-w-[1200px] px-4">
-        
+      <div className="w-full max-w-300 px-4">
+
         {/* 💻 نمای دسکتاپ */}
-        <div className="hidden md:block w-full">
+        <div className="hidden lg:block w-full">
           <svg viewBox="0 0 1200 1900" className="w-full h-auto overflow-visible" fill="none" xmlns="http://www.w3.org/2000/svg">
             <motion.path
               d="M 1150 150 C 850 200, 620 300, 560 450 C 480 650, 550 800, 640 950 C 750 1150, 620 1350, 560 1550 C 530 1650, 560 1700, 600 1750"
@@ -99,13 +198,15 @@ export default function TimelineSection() {
             {combinedData.map((item) => (
               <TimelineDesktopRow key={item.id} item={item} scrollYProgress={scrollYProgress} />
             ))}
+            {/* اضافه کردن دایره‌های انتهایی */}
+            <EndCircles scrollYProgress={scrollYProgress} />
           </svg>
         </div>
 
         {/* 📱 نمای موبایل */}
-        <div className={`block md:hidden relative ${isRtl ? 'pr-8 pl-2' : 'pl-8 pr-2'} w-full`}>
-          <div className={`absolute top-2 bottom-2 w-[2px] bg-gradient-to-b from-white via-white/50 to-transparent ${isRtl ? 'right-3' : 'left-3'}`} />
-          <div className={`absolute -bottom-2 w-4 h-4 rounded-full bg-[#8b5cf6] shadow-[0_0_10px_#8b5cf6] ${isRtl ? 'right-[6px]' : 'left-[6px]'}`} />
+        <div className={`block lg:hidden relative  ${isRtl ? 'pr-8 pl-2' : 'pl-8 pr-2'} w-full`}>
+          <div className={`absolute top-2 bottom-2 w-0.5 bg-linear-to-b from-white via-white/50 to-transparent ${isRtl ? 'right-3' : 'left-3'}`} />
+          <div className={`absolute -bottom-2 w-4 h-4 rounded-full bg-[#8b5cf6] shadow-[0_0_10px_#8b5cf6] ${isRtl ? 'right-1.5' : 'left-1.5'}`} />
 
           <div className="flex flex-col gap-12 w-full">
             {combinedData.map((item) => (
@@ -115,9 +216,9 @@ export default function TimelineSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: false, margin: "-100px" }}
                 transition={{ type: "spring", stiffness: 70, damping: 14 }}
-                className="relative w-full flex flex-col items-start"
+                className="relative w-full flex flex-col items-start px-20"
               >
-                <div className={`absolute top-6 w-3 h-3 rounded-full bg-[#8b5cf6] shadow-[0_0_6px_#8b5cf6] z-10 ${isRtl ? '-right-[24px]' : '-left-[24px]'}`} />
+                <div className={`absolute top-6 w-3 h-3 rounded-full bg-[#8b5cf6] shadow-[0_0_6px_#8b5cf6] z-10 ${isRtl ? '-right-6' : '-left-6'}`} />
                 <div className="bg-[#131318] border border-gray-800 text-white font-bold text-sm px-3 py-1 rounded-md mb-3 shadow-md">
                   {item.translatedYear}
                 </div>
