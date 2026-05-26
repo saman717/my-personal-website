@@ -154,8 +154,8 @@ export default function TimelineSection() {
   relative 
   after:content-[''] 
   after:absolute 
-  after:-bottom-6 
-  after:w-24 
+  after:-bottom-4
+
   after:h-1 
   after:rounded-full
   after:bg-white/20 
@@ -165,7 +165,7 @@ export default function TimelineSection() {
   
   // انیمیشن روی همه خواص
   after:transition-all 
-  after:duration-500 
+  after:duration-900 
   after:ease-out
   
   ${isRtl
@@ -176,10 +176,11 @@ export default function TimelineSection() {
        // افکت نئون قوی‌تر در هاور
        hover:after:shadow-[0_0_10px_#8b5cf6,0_0_20px_#8b5cf6,0_0_45px_#8b5cf6]`
             : `text-left after:left-0 
-       hover:after:translate-x-45 
-       hover:after:w-12 
+            after:w-20
+        hover:after:left-[9%]
+       hover:after:w-80
        hover:after:bg-[#8b5cf6] 
-       hover:after:shadow-[0_0_15px_#8b5cf6,0_0_30px_#8b5cf6,0_0_45px_#8b5cf6]`
+       hover:after:shadow-[0_0_10px_#8b5cf6,0_0_20px_#8b5cf6,0_0_45px_#8b5cf6]`
           }
 `}>
           {t('timeline.title')}
@@ -216,7 +217,7 @@ export default function TimelineSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: false, margin: "-100px" }}
                 transition={{ type: "spring", stiffness: 70, damping: 14 }}
-                className="relative w-full flex flex-col items-start px-20"
+                className="relative w-full flex flex-col items-start px-10"
               >
                 <div className={`absolute top-6 w-3 h-3 rounded-full bg-[#8b5cf6] shadow-[0_0_6px_#8b5cf6] z-10 ${isRtl ? '-right-6' : '-left-6'}`} />
                 <div className="bg-[#131318] border border-gray-800 text-white font-bold text-sm px-3 py-1 rounded-md mb-3 shadow-md">

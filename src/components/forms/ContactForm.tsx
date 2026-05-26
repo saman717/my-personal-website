@@ -42,35 +42,32 @@ export const ContactForm: React.FC<ContactFormProps> = ({ labels, isRTL }) => {
     console.log("Submitted Data:", data);
   };
 
-  // استایل شیشه‌ای پیشرفته برای اینپوت‌ها (Glassmorphism)
   const inputContainerClasses = 
     "w-full bg-[#202024]/40 backdrop-blur-md border border-white/[0.06] hover:border-white/[0.12] focus-within:border-purple-500/80 rounded-2xl transition-all duration-300 px-4 py-3 min-h-[42px] flex flex-col justify-center shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]";
   
-  // تراز متن داخل اینپوت‌ها (دقیقاً برعکس قبلی)
+  // ترازها: در فارسی راست‌چین و در انگلیسی چپ‌چین
   const inputClasses = `w-full bg-transparent text-white placeholder-gray-600 focus:outline-none text-sm md:text-base selection:bg-purple-500/30 ${
-    isRTL ? "text-left" : "text-right"
+    isRTL ? "text-right" : "text-left"
   }`;
 
-  // تراز داینامیک لیبل‌ها (دقیقاً برعکس قبلی: چپ در فارسی / راست در انگلیسی)
   const labelAlignmentClasses = `block text-gray-300 text-sm font-medium select-none w-full ${
-    isRTL ? "text-left pl-1" : "text-right pr-1"
+    isRTL ? "text-right pr-1" : "text-left pl-1"
   }`;
 
-  // تراز داینامیک ارورها (دقیقاً برعکس قبلی: چپ در فارسی / راست در انگلیسی)
-  const errorAlignmentClasses = `text-red-400 text-xs animate-pulse w-full ${
-    isRTL ? "text-left pl-1" : "text-right pr-1"
+  const errorAlignmentClasses = `text-red-400 text-xs animate-pulse w-full mt-1 ${
+    isRTL ? "text-right pr-1" : "text-left pl-1"
   }`;
 
   return (
     <form 
       onSubmit={handleSubmit(onSubmit)} 
-      className="w-[90%] max-w-100 space-y-2.5" 
+      className="w-[90%] max-w-100 space-y-3" 
       dir={isRTL ? "rtl" : "ltr"}
     >
       {/* نام و نام خانوادگی */}
       <div className="space-y-2">
         <label className={labelAlignmentClasses}>
-           : {labels.fullName} 
+           {labels.fullName} :
         </label>
         <div className={inputContainerClasses}>
           <input
@@ -91,7 +88,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({ labels, isRTL }) => {
       {/* شماره تماس */}
       <div className="space-y-2">
         <label className={labelAlignmentClasses}>
-          : {labels.phone} 
+          {labels.phone} :
         </label>
         <div className={inputContainerClasses}>
           <input
@@ -115,7 +112,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({ labels, isRTL }) => {
       {/* ایمیل */}
       <div className="space-y-2">
         <label className={labelAlignmentClasses}>
-          : {labels.email}
+          {labels.email} :
         </label>
         <div className={inputContainerClasses}>
           <input
@@ -126,7 +123,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({ labels, isRTL }) => {
               required: labels.errors.email,
               pattern: { value: /^\S+@\S+$/i, message: labels.errors.email }
             })}
-            className={`${inputClasses} `}
+            className={inputClasses}
           />
         </div>
         {errors.email && (
@@ -139,7 +136,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({ labels, isRTL }) => {
       {/* پیام */}
       <div className="space-y-2">
         <label className={labelAlignmentClasses}>
-          : {labels.message} 
+          {labels.message} :
         </label>
         <div className={`${inputContainerClasses} py-3`}>
           <textarea
@@ -160,7 +157,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({ labels, isRTL }) => {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full mt-2 bg-[#09090b] border border-white text-white/80 rounded-[11px] p-4 text-base md:text-lg font-semibold hover:bg-white/85 hover:text-black transition-all duration-300 cursor-pointer disabled:opacity-50 tracking-wide shadow-lg active:scale-[0.99]"
+        className="w-full mt-4 bg-[#09090b] border border-white text-white/80 rounded-[11px] p-4 text-base md:text-lg font-semibold hover:bg-white/85 hover:text-black transition-all duration-300 cursor-pointer disabled:opacity-50 tracking-wide shadow-lg active:scale-[0.99]"
       >
         {isSubmitting ? labels.submitting : labels.submit}
       </button>

@@ -63,7 +63,7 @@ export default function SkillsSection() {
           </h2>
         </motion.div>
 
-        <div className="grid  md:px-0 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid  md:px-0 grid-cols-1 sm:grid-cols-2 px-15 lg:grid-cols-4 gap-6">
           {skillsData.map((category, index) => (
             <SkillCard
               key={index}
