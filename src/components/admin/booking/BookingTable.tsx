@@ -24,7 +24,7 @@ interface BookingTableProps {
     requests: BookingRequest[];
     selectedId: string | null;
     onSelectRequest: (request: BookingRequest) => void;
-    filter: "ALL" | "PENDING" | "ACCEPTED" | "CONFIRMED";
+    filter: "ALL" | "PENDING" | "ACCEPTED" | "CONFIRMED" | "REJECTED";
     onUpdateStatus: (id: string, newStatus: "ACCEPTED" | "REJECTED" | "CONFIRMED") => void;
 }
 

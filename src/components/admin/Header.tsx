@@ -95,7 +95,7 @@ export default function Header({
 
 
           <div className="text-[10px] text-gray-400">
-            <TimeDisplay />
+            <TimeDisplay locale={locale} />
           </div>
 
         </div>

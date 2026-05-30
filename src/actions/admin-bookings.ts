@@ -27,7 +27,7 @@ export async function getAdminBookingsAction() {
  * ۲. تغییر وضعیت یک رزرو (تایید یا رد)
  * ✨ فیکس شد: تغییر تایپ bookingId به string به دلیل استفاده از UUID در دیتابیس
  */
-export async function updateBookingStatusAction(bookingId: string, newStatus: "ACCEPTED" | "REJECTED") {
+export async function updateBookingStatusAction(bookingId: string, newStatus:"ACCEPTED" | "REJECTED" | "CONFIRMED") {
   try {
     await db
       .update(bookings)

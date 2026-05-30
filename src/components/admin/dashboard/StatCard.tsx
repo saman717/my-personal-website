@@ -7,7 +7,7 @@ interface StatCardProps {
   title: string;
   value: string | number;
   subtext: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   // تعیین تم رنگی نئونی کارت: 'emerald' | 'blue' | 'purple'
   variant?: "emerald" | "blue" | "purple";
 }
