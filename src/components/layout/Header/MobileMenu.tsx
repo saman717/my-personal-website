@@ -9,12 +9,7 @@ interface NavItem {
   label: string;
 }
 
-export default function MobileMenu({
-  items,
-  locale,
-}: {
-  items: NavItem[];
-  locale: string;
+export default function MobileMenu({items,locale,}: {items: NavItem[];locale: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false); // در حال انیمیشن (ورود یا خروج)

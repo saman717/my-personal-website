@@ -10,7 +10,7 @@ export default async function Header({ locale }: { locale: string }) {
     { key: 'portfolio', href: '/portfolio' },
     { key: 'blog', href: '/blog' },
     { key: 'contact', href: '/contact' },
-    { key: 'appointment', href: '/appointment' },
+    { key: 'appointment', href: '/booking' },
   ];
 
   const navItemsTranslated = await Promise.all(

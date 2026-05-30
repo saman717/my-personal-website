@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef } from 'react';
-import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
+import { motion, useScroll, useTransform, MotionValue,useSpring } from 'framer-motion';
 import { useTranslate } from '@/hooks/useTranslate';
 import { geoPositions, GeoPositionItem } from '@/data/timelineData';
 
@@ -122,7 +122,7 @@ export default function TimelineSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
 
   // ⚡️ استفاده از خروجی‌های هوک خودت به صورت Destructuring
-  const { locale, t, mounted } = useTranslate();
+  const { locale, t } = useTranslate();
 
   const isRtl = locale === 'fa';
 
@@ -135,14 +135,39 @@ export default function TimelineSection() {
   }));
 
   const { scrollYProgress } = useScroll({
-    target: mounted ? sectionRef : undefined,
+    target: sectionRef,
     offset: ["start start", "end end"],
   });
 
-  const lineProgress = useTransform(scrollYProgress, [0, 0.20, 0.55, 0.85, 1], [0, 0.35, 0.70, 0.95, 1]);
+  // ۱. نگاشت چند نقطه‌ای دقیق بر اساس فواصل اختصاصی کارت‌های شما
+  const transformedProgress = useTransform(
+    scrollYProgress,
+    [
+      0,      // شروع سکشن
+      0.18,   // اسکرول دقیق کارت اول
+      0.44,   // اسکرول دقیق کارت دوم
+      0.68,   // اسکرول دقیق کارت سوم
+      0.88,   // اسکرول دقیق کارت چهارم
+      1       // پایان سکشن
+    ],
+    [
+      0,      // خط هنوز شروع نشده
+      0.35,   // خط به دایره کارت اول رسیده
+      0.55,   // خط به دایره کارت دوم رسیده
+      0.78,   // خط به دایره کارت سوم رسیده
+      0.92,   // خط به دایره کارت چهارم رسیده
+      1       // خط ۱۰۰٪ کامل شده
+    ]
+  );
+
+  // ۲. تزریق فیزیکِ نرم و حرکتِ سیالِ فنری به خط SVG
+  const lineProgress = useSpring(transformedProgress, {
+    stiffness: 85,   // 💡 میزان سفتی فنر: هرچه کمتر باشد، حرکت خط ملوتر، نرم‌تر و با تاخیرِ سینماییِ قشنگ‌تری دنبال می‌شود (پیش‌فرض ۱۰۰ است)
+    damping: 20,     // 💡 میزان نوسان: کمک می‌کند خط هنگام تغییر سرعت یا ایستادن، تیک نزند و بسیار روان متوقف شود
+    restDelta: 0.001 // 💡 دقت محاسباتی انیمیشن برای رندر بهینه
+  });
 
   // گارد رندر برای جلوگیری از Hydration Mismatch تا زمانی که هوک روی کلاینت مونت شود
-  if (!mounted) return <div className="w-full h-96 bg-[#0d0d12]" />;
 
   return (
     <section ref={sectionRef} className="w-full bg-[#0d0d12] py-16 md:py-20 flex flex-col items-center">

@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import React, { useState } from "react";
+
 
 interface ContactInfoLabels {
     heading: string;
@@ -17,6 +19,7 @@ interface ContactInfoProps {
     socialCount?: number;
     labels: ContactInfoLabels;
     isRTL: boolean;
+    locale:string
 }
 
 export const ContactInfo: React.FC<ContactInfoProps> = ({
@@ -24,7 +27,8 @@ export const ContactInfo: React.FC<ContactInfoProps> = ({
     phone,
     socialCount = 5,
     labels,
-    isRTL
+    isRTL,
+    locale
 }) => {
     const [copiedText, setCopiedText] = useState<string | null>(null);
 
@@ -120,16 +124,18 @@ export const ContactInfo: React.FC<ContactInfoProps> = ({
             </div>
 
             {/* دکمه تعیین وقت */}
-            <div className="relative group rounded-xl p-px bg-gradient-to-l from-emerald-500 via-emerald-400 to-purple-600 shadow-[0_0_25px_rgba(16,185,129,0.12)] hover:shadow-[0_0_35px_rgba(16,185,129,0.25)] transition-all duration-500">
-                <button
-                    onClick={() => console.log("Calendar Opened")}
+            <div className
+                ="relative group rounded-xl p-px bg-gradient-to-l from-emerald-500 via-emerald-400 to-purple-600 shadow-[0_0_25px_rgba(16,185,129,0.12)] hover:shadow-[0_0_35px_rgba(16,185,129,0.25)] transition-all duration-500">
+
+                <Link
+                    href={`/${locale}/booking`} // مسیر مورد نظر خود را جایگزین کنید
                     className="w-full flex items-center justify-between bg-[#090a0f] rounded-[11px] p-4 text-white font-semibold transition-all duration-300 cursor-pointer"
                 >
                     <span className="text-base md:text-lg tracking-wide">
                         {labels.scheduleMeeting}
                     </span>
                     <div className="w-7 h-7 border border-purple-500/80 rounded-md bg-purple-500/5 shadow-[inset_0_0_8px_rgba(168,85,247,0.2)]" />
-                </button>
+                </Link>
             </div>
         </div>
     );

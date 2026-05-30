@@ -50,6 +50,7 @@ export default async function ContactSection({ locale }: ContactSectionProps) {
             socialCount={5}
             labels={infoLabels}
             isRTL={isRTL}
+            locale={locale}
           />
         </div>
 
@@ -60,7 +61,7 @@ export default async function ContactSection({ locale }: ContactSectionProps) {
             در RTL: سمت چپ تصویر قرار می‌گیرد (و متمایل به خط وسط)
             در LTR: سمت راست تصویر قرار می‌گیرد (و متمایل به خط وسط) */}
         <div className="flex justify-center w-full order-3 md:order-3 md:justify-start">
-          <ContactForm labels={contactDict.form} isRTL={isRTL} />
+          <ContactForm  labels={contactDict.form} isRTL={isRTL} />
         </div>
 
       </div>

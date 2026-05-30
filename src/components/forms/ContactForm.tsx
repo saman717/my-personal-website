@@ -3,6 +3,8 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { ContactFormData } from "@/types/types";
+import { sendContactMessage } from "@/actions/contact"; // 🚀 وارد کردن اکشن سرور
+import { useToast } from "@/context/ToastContext";
 
 interface ContactFormLabels {
   fullName: string;
@@ -31,43 +33,66 @@ interface ContactFormProps {
 }
 
 export const ContactForm: React.FC<ContactFormProps> = ({ labels, isRTL }) => {
+  const { showToast } = useToast();
+
   const {
     register,
     handleSubmit,
+    reset, // 💡 برای پاک کردن فرم بعد از ارسال موفق
     formState: { errors, isSubmitting },
   } = useForm<ContactFormData>();
 
   const onSubmit = async (data: ContactFormData) => {
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    console.log("Submitted Data:", data);
+    try {
+      // صدا زدن مستقیم تابع سرور با تمام قابلیت‌های Type-Safe
+      const result = await sendContactMessage({
+        fullName: data.fullName,
+        phone: data.phone,
+        email: data.email,
+        message: data.message,
+        locale: isRTL ? "fa" : "en",
+      });
+
+      if (result.success) {
+        showToast(
+          isRTL ? "پیام شما با موفقیت ارسال شد!" : "Your message has been sent successfully!",
+          "success"
+        );
+        reset(); // فرم بازنشانی می‌شود
+      } else {
+        showToast(
+          isRTL ? "خطایی در ارسال پیام رخ داد." : "Something went wrong.",
+          "error"
+        );
+      }
+    } catch (error) {
+      console.error("Submission Error:", error);
+      showToast(isRTL ? "خطای غیرمنتظره رخ داد." : "Unexpected error.", "error");
+    }
   };
 
-  const inputContainerClasses = 
+  const inputContainerClasses =
     "w-full bg-[#202024]/40 backdrop-blur-md border border-white/[0.06] hover:border-white/[0.12] focus-within:border-purple-500/80 rounded-2xl transition-all duration-300 px-4 py-3 min-h-[42px] flex flex-col justify-center shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]";
-  
-  // ترازها: در فارسی راست‌چین و در انگلیسی چپ‌چین
-  const inputClasses = `w-full bg-transparent text-white placeholder-gray-600 focus:outline-none text-sm md:text-base selection:bg-purple-500/30 ${
-    isRTL ? "text-right" : "text-left"
-  }`;
 
-  const labelAlignmentClasses = `block text-gray-300 text-sm font-medium select-none w-full ${
-    isRTL ? "text-right pr-1" : "text-left pl-1"
-  }`;
+  const inputClasses = `w-full bg-transparent text-white placeholder-gray-600 focus:outline-none text-sm md:text-base selection:bg-purple-500/30 ${isRTL ? "text-right" : "text-left"
+    }`;
 
-  const errorAlignmentClasses = `text-red-400 text-xs animate-pulse w-full mt-1 ${
-    isRTL ? "text-right pr-1" : "text-left pl-1"
-  }`;
+  const labelAlignmentClasses = `block text-gray-300 text-sm font-medium select-none w-full ${isRTL ? "text-right pr-1" : "text-left pl-1"
+    }`;
+
+  const errorAlignmentClasses = `text-red-400 text-xs animate-pulse w-full mt-1 ${isRTL ? "text-right pr-1" : "text-left pl-1"
+    }`;
 
   return (
-    <form 
-      onSubmit={handleSubmit(onSubmit)} 
-      className="w-[90%] max-w-100 space-y-3" 
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="w-[90%] max-w-100 space-y-3"
       dir={isRTL ? "rtl" : "ltr"}
     >
       {/* نام و نام خانوادگی */}
       <div className="space-y-2">
         <label className={labelAlignmentClasses}>
-           {labels.fullName} :
+          {labels.fullName} :
         </label>
         <div className={inputContainerClasses}>
           <input
@@ -92,10 +117,10 @@ export const ContactForm: React.FC<ContactFormProps> = ({ labels, isRTL }) => {
         </label>
         <div className={inputContainerClasses}>
           <input
-            type="tel"
+            type="text"
             autoComplete="off"
             placeholder={labels.placeholders.phone}
-            {...register("phone", { 
+            {...register("phone", {
               required: labels.errors.phone,
               pattern: { value: /^[0-9+]{11,14}$/, message: labels.errors.phone }
             })}
@@ -119,7 +144,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({ labels, isRTL }) => {
             type="email"
             autoComplete="off"
             placeholder={labels.placeholders.email}
-            {...register("email", { 
+            {...register("email", {
               required: labels.errors.email,
               pattern: { value: /^\S+@\S+$/i, message: labels.errors.email }
             })}

@@ -85,5 +85,160 @@
       "heading": "Let's work together",
       "description": "Feel free to reach out for collaborations or just to say hi."
     }
+  },
+  "booking": {
+    "title": "Book a Meeting",
+    "localTime": "Local Time:",
+    "detecting": "Detecting...",
+    "autoDetected": "(Auto-detected)",
+    "selectDate": "Select Date",
+    "selectTime": "Select Time",
+    "bookingDetails": "Booking Details",
+    "meetingType": "Meeting Type",
+    "online": "Online (Google Meet)",
+    "inPerson": "In-Person",
+    "name": "Name",
+    "email": "Email",
+    "projectDesc": "Project Description",
+    "submitBtn": "Confirm Booking",
+    "summary": "Booking Summary",
+    "soonTimeSlots": "Time slot component (Coming soon...)",
+    "soonForm": "Form component (Coming soon...)",
+    "summaryDate": "Selected Date:",
+    "summaryTime": "Selected Time:",
+    "summaryType": "Meeting Type:",
+    "noDateTime": "Please select a date and time from the calendar first."
+  },
+  "footer": {
+    "name": "Saman Khoshnood",
+    "role": "Front-End Developer & Designer",
+    "description": "I build fast, responsive, and engineered user interfaces. The web is my main canvas for design and coding, but my boundaries extend wherever logic and code flow – from servers and APIs to automation and bots.",
+    "quickLinksTitle": "Quick Links",
+    "socialsTitle": "On Networks"
+  },
+  "admin": {
+    "console": "Persian OS",
+    "status": "Console",
+    "exit": "Exit to Main Site",
+    "welcome": "Hello Mohamad, welcome ✨",
+    "date": "May 25, 2026 (Global) / 5 Khordad 1405 (SH)",
+    "categories": {
+      "site": "Site Management",
+      "personal": "Personal & Career OS"
+    },
+    "menu": {
+      "dashboard": "Dashboard",
+      "messages": "Messages",
+      "blog": "Blog",
+      "portfolio": "Portfolio",
+      "media": "Media",
+      "settings": "Settings",
+      "tasks": "Tasks",
+      "appointments": "Appointments",
+      "jobHunt": "Job Hunt CRM",
+      "growth": "Personal Growth",
+      "bots": "Bot Hub",
+      "automation": "Automation"
+    },
+    "dashboard": {
+      "stats": {
+        "messages": {
+          "title": "Total Messages",
+          "subtext": "5 new submissions this week"
+        },
+        "tasks": {
+          "title": "Active Tasks",
+          "subtext": "3 high-priority due soon"
+        },
+        "jobHunt": {
+          "title": "Applications (Migration CRM)",
+          "subtext": "1 technical interview pending"
+        }
+      },
+      "chart": {
+        "title": "Weekly Insights & Views",
+        "subtitle": "Overview of web traffic and user contacts",
+        "views": "Views",
+        "messages": "Messages",
+        "days": {
+          "Mon": "Mon",
+          "Tue": "Tue",
+          "Wed": "Wed",
+          "Thu": "Thu",
+          "Fri": "Fri",
+          "Sat": "Sat",
+          "Sun": "Sun"
+        }
+      },
+      "telemetry": {
+        "title": "System & Bot Telemetry",
+        "cpu": "CPU Usage",
+        "ram": "Memory (RAM)",
+        "uptime": "Uptime",
+        "nodeServer": "Node.js Core",
+        "telegramBot": "Telegram Bot",
+        "online": "Online",
+        "offline": "Offline"
+      },
+      "messagesList": {
+        "title": "Recent Messages",
+        "viewAll": "View All",
+        "unread": "New"
+      },
+      "activity": {
+        "title": "Activity Timeline",
+        "event1": "New Telegram Bot version deployed",
+        "event2": "Visa application status updated",
+        "event3": "Database backup completed successfully",
+        "now": "Just now",
+        "hoursAgo": "hrs ago"
+      },
+      "messagesPage": {
+        "title": "Inbox & Messages",
+        "subtitle": "Manage and respond to user contact forms and inquiries",
+        "searchPlaceholder": "Search by name, email or content...",
+        "noMessages": "No messages found matching your criteria.",
+        "filters": {
+          "all": "All Messages",
+          "unread": "Unread",
+          "read": "Read"
+        },
+        "table": {
+          "sender": "Sender",
+          "message": "Message Snippet",
+          "date": "Received At",
+          "actions": "Actions"
+        },
+        "actions": {
+          "view": "View Message",
+          "delete": "Delete",
+          "markRead": "Mark as Read",
+          "markUnread": "Mark as Unread"
+        },
+        "modal": {
+          "subject": "Subject",
+          "email": "Email Address",
+          "date": "Sent Date",
+          "close": "Close Preview"
+        }
+      }
+    }
+  },
+  "adminBooking": {
+    "title": "Booking Requests & Meeting Management",
+    "tableClient": "Client",
+    "tableTime": "Time Slot",
+    "tableCreated": "Requested",
+    "tableType": "Meeting Type",
+    "tableStatus": "Status",
+    "globalRules": "Booking Global Rules",
+    "bufferTime": "Buffer Time between sessions",
+    "noticeHorizon": "Notice Horizon",
+    "projectDesc": "Client Project Descriptions",
+    "clientSubmitted": "Client Submitted",
+    "projectNotes": "Project Notes",
+    "statusPending": "Pending",
+    "statusAccepted": "Accepted",
+    "statusConfirmed": "Confirmed"
   }
 }

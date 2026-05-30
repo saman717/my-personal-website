@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "src/timelineData.txs"  ],
+, "src/timelineData.txs", "src/components/layout/footer/Footer", "src/hooks/useMessageMutations.ts"  ],
   "exclude": ["node_modules"]
 }
