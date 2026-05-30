@@ -49,7 +49,7 @@ export default async function Header({ locale }: { locale: string }) {
 
           {/* Actions */}
           <div className="flex items-center gap-4">
-            <LanguageSwitcher locale={locale} />
+            <LanguageSwitcher  />
             <Link
               href="/resume.pdf"
               target="_blank"
