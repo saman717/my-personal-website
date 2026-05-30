@@ -72,12 +72,7 @@ export default function Header({
         </button>
 
         {/* Language Switcher */}
-        <LanguageSwitcher
-          locale={locale}
-          onChange={
-            handleLanguageChange
-          }
-        />
+        <LanguageSwitcher/>
       </div>
 
       {/* Right Section */}
