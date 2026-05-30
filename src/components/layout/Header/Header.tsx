@@ -49,13 +49,7 @@ export default async function Header({ locale }: { locale: string }) {
 
           {/* Actions */}
           <div className="flex items-center gap-4">
-            <LanguageSwitcher
-              locale={locale}
-              onChange={(newLocale) => {
-                // اینجا منطق تغییر زبان را بنویس (مثلاً با استفاده از useRouter)
-                console.log("Language changed to:", newLocale);
-              }}
-            />
+            <LanguageSwitcher />
             <Link
               href="/resume.pdf"
               target="_blank"

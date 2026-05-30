@@ -2,12 +2,9 @@
 
 import { usePathname, useRouter } from "next/navigation";
 
-interface LanguageSwitcherProps {
-  locale: string;
-  onChange: (newLocale: string) => void;
-}
 
-export default function LanguageSwitcher({ locale, onChange }: LanguageSwitcherProps) {
+
+export default function LanguageSwitcher() {
   const pathname = usePathname();
 
   const router = useRouter();
