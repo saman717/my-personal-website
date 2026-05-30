@@ -1,26 +1,23 @@
 "use client";
 
 import React, { useState } from "react";
-
+import { useParams } from "next/navigation"; // ۱. این هوک را اضافه کردیم
 import Sidebar from "@/components/admin/Sidebar";
-
 import Header from "@/components/admin/Header";
-
 import { ToastProvider } from "@/context/ToastContext";
-
 import { ReactQueryProvider } from "@/providers/ReactQueryProvider";
 
 export default function AdminLayout({
     children,
-    locale,
 }: {
     children: React.ReactNode;
-    locale: string;
 }) {
-    const isRTL = locale === "fa";
+    // ۲. دریافت پارامترها به صورت کلاینت‌ساید
+    const params = useParams();
+    const locale = (params.locale as string) || "fa"; // استخراج لوکیل از آدرس
 
-    const [mobileMenuOpen, setMobileMenuOpen] =
-        useState(false);
+    const isRTL = locale === "fa";
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
         <div
@@ -28,13 +25,10 @@ export default function AdminLayout({
             className="h-screen bg-[#07070a] text-gray-200 flex overflow-hidden"
         >
             <ReactQueryProvider>
-
                 {/* overlay موبایل */}
                 {mobileMenuOpen && (
                     <div
-                        onClick={() =>
-                            setMobileMenuOpen(false)
-                        }
+                        onClick={() => setMobileMenuOpen(false)}
                         className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
                     />
                 )}
@@ -51,7 +45,7 @@ export default function AdminLayout({
                             ? "translate-x-0"
                             : isRTL
                                 ? "translate-x-full"
-                                : "-translate-x-full"
+                                : "-translate-x-false"
                         }`}
                 >
                     <Sidebar locale={locale} />
@@ -59,14 +53,9 @@ export default function AdminLayout({
 
                 {/* content */}
                 <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-
                     <Header
                         locale={locale}
-                        onMenuToggle={() =>
-                            setMobileMenuOpen(
-                                (prev) => !prev
-                            )
-                        }
+                        onMenuToggle={() => setMobileMenuOpen((prev) => !prev)}
                     />
 
                     <ToastProvider>
@@ -76,9 +65,7 @@ export default function AdminLayout({
                             </div>
                         </main>
                     </ToastProvider>
-
                 </div>
-
             </ReactQueryProvider>
         </div>
     );
