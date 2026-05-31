@@ -1,3 +1,5 @@
+
+
 "use client";
 
 import React, {
@@ -5,7 +7,10 @@ import React, {
   useContext,
   useState,
   useCallback,
+  useEffect,
 } from "react";
+
+import { usePathname } from "next/navigation";
 
 type ToastType =
   | "success"
@@ -41,10 +46,17 @@ export const ToastProvider = ({
   children,
 }: {
   children: React.ReactNode;
+
 }) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const timeoutIdsRef = React.useRef<Map<number, NodeJS.Timeout>>(new Map());
+  const pathname = usePathname();
+  const locale =
+    pathname.split("/")[1] === "en"
+      ? "en"
+      : "fa";
 
+  const isRTL = locale === "fa";
   const dismissToast = useCallback((id: number) => {
     setToasts((prev) =>
       prev.map((t) =>
@@ -96,6 +108,12 @@ export const ToastProvider = ({
     },
     [dismissToast]
   );
+  useEffect(() => {
+    return () => {
+      timeoutIdsRef.current.forEach(clearTimeout);
+      timeoutIdsRef.current.clear();
+    };
+  }, []);
 
   return (
     <ToastContext.Provider
@@ -107,7 +125,10 @@ export const ToastProvider = ({
     >
       {children}
 
-      <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full px-4 sm:px-0">
+      <div
+        className={`fixed bottom-5 z-50 flex flex-col gap-3 max-w-sm w-full px-4 sm:px-0
+  ${isRTL ? "right-5" : "left-5"}`}
+      >
         {toasts.map((t) => (
           <div
             key={t.id}
@@ -177,13 +198,18 @@ export const ToastProvider = ({
               )}
             </div>
 
-            <div className="flex-1 text-sm font-medium leading-relaxed select-none">
+            <div
+              className={`flex-1 text-sm font-medium leading-relaxed select-none
+  ${isRTL ? "text-right" : "text-left"}`}
+            >
               {t.message}
             </div>
 
             <button
               onClick={() => dismissToast(t.id)}
-              className="mt-0.5 flex-shrink-0 text-gray-500 hover:text-white transition-colors duration-200 cursor-pointer text-xs bg-white/5 hover:bg-white/10 p-1 rounded-md"
+              className={`mt-0.5 flex-shrink-0 text-gray-500 hover:text-white
+  ${isRTL ? "mr-auto" : "ml-auto"}
+  transition-colors duration-200 cursor-pointer text-xs bg-white/5 hover:bg-white/10 p-1 rounded-md`}
             >
               ✕
             </button>
