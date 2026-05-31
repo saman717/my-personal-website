@@ -45,7 +45,7 @@ export default async function HeroSection({
           />
 
           <HeroImage
-            src="/images/Man.png"
+            src="/images/Man_1.jpg"
             alt={hero.title}
           />
         </div>
