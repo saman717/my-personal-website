@@ -39,7 +39,7 @@ export default function Sidebar({ locale }: { locale: string }) {
                         <span className={`px-2 md:px-5 text-[9px] md:text-[10px] text-gray-600 uppercase tracking-wider mb-2 block ${isRTL ? 'text-right' : 'text-left'}`}>
                             {t("admin.categories.site")}
                         </span>
-                        <NavLink href={`/${locale}/admin/dashboard`}>{t("admin.menu.dashboard")}</NavLink>
+                        <NavLink href={`/${locale}/admin`}>{t("admin.menu.dashboard")}</NavLink>
                         <NavLink
                             href={`/${locale}/admin/messages`}
                             badge={unreadCount > 0 ? `+${unreadCount}` : undefined}
@@ -59,7 +59,7 @@ export default function Sidebar({ locale }: { locale: string }) {
                             {t("admin.categories.personal")}
                         </span>
                         <NavLink href={`/${locale}/admin/tasks`}>{t("admin.menu.tasks")}</NavLink>
-                        <NavLink href={`/${locale}/admin/appointments`}>{t("admin.menu.appointments")}</NavLink>
+                        <NavLink href={`/${locale}/admin/bookings`}>{t("admin.menu.appointments")}</NavLink>
                         <NavLink href={`/${locale}/admin/job-hunt`}>{t("admin.menu.jobHunt")}</NavLink>
                         <NavLink href={`/${locale}/admin/growth`}>{t("admin.menu.growth")}</NavLink>
                         <NavLink href={`/${locale}/admin/bots`}>{t("admin.menu.bots")}</NavLink>
