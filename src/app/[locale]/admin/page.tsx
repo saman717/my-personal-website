@@ -1,26 +1,36 @@
-import { getContactMessages } from "@/actions/messages";
+import StatsGrid from "@/components/admin/dashboard/StatsGrid";
+import AnalyticsChart from "@/components/admin/dashboard/AnalyticsChart";
+import ServerTelemetryCard from "@/components/admin/dashboard/ServerTelemetryCard";
+import RecentMessagesCard from "@/components/admin/dashboard/RecentMessagesCard";
+import ActivityTimelineCard from "@/components/admin/dashboard/ActivityTimelineCard";
 
-export default async function AdminPage() {
-  // 🛰️ فراخوانی مستقیم اکشن در یک Server Component
-  const result = await getContactMessages();
-
-  if (result.success) {
-    // این لاگ مستقیم در ترمینال VS Code چاپ می‌شود، نه مروگر!
-    console.log("🍏 Successfully fetched messages from DB:", result.data);
-  } else {
-    console.error("🍎 Failed to fetch:", result.error);
-  }
+export default async function AdminPage({
+  params,
+}: {
+  params: Promise<{ locale: string }> | { locale: string };
+}) {
+  const resolvedParams = await params;
+  const locale = resolvedParams.locale;
 
   return (
-    <div className="min-h-screen text-white p-10 flex flex-col gap-4">
-      <h1 className="text-2xl font-bold text-emerald-400">تست اولیه پنل مدیریت</h1>
-      <p className="text-gray-400 text-sm">
-        اگر دیتابیس وصل باشد، لیست پیام‌ها را همین الان در ترمینال VS Code می‌بینی.
-      </p>
-      
-      {/* نمایش متنیِ تعداد پیام‌ها برای اطمینان در مرورگر */}
-      <div className="p-4 bg-white/5 border border-white/10 rounded-xl max-w-md">
-        تعداد پیام‌های یافت شده: <span className="text-emerald-400 font-bold">{result.data?.length || 0}</span>
+    <div className="flex flex-col w-full gap-5 pb-10">
+      {/* ردیف اول: کارت‌های آماری */}
+      <StatsGrid />
+
+      {/* ردیف دوم: نمودار (دو ستون) و تلمتری (یک ستون) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 w-full">
+        <div className="lg:col-span-2">
+          <AnalyticsChart />
+        </div>
+        <div className="lg:col-span-1">
+          <ServerTelemetryCard />
+        </div>
+      </div>
+
+      {/* ردیف سوم: پیام‌های اخیر و تایم‌لاین فعالیت‌ها */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 w-full mt-2">
+        <RecentMessagesCard locale={locale} />
+        <ActivityTimelineCard />
       </div>
     </div>
   );

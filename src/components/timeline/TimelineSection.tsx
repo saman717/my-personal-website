@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef } from 'react';
-import { motion, useScroll, useTransform, MotionValue,useSpring } from 'framer-motion';
+import { motion, useScroll, useTransform, MotionValue, useSpring } from 'framer-motion';
 import { useTranslate } from '@/hooks/useTranslate';
 import { geoPositions, GeoPositionItem } from '@/data/timelineData';
 
@@ -179,7 +179,7 @@ export default function TimelineSection() {
   relative 
   after:content-[''] 
   after:absolute 
-  after:-bottom-4
+  after:-bottom-6
 
   after:h-1 
   after:rounded-full
@@ -187,7 +187,6 @@ export default function TimelineSection() {
   
   // سایه اولیه (هاله نئونی خیلی کم)
   after:shadow-[0_0_5px_rgba(139,92,246,0.3)]
-  
   // انیمیشن روی همه خواص
   after:transition-all 
   after:duration-900 
@@ -196,7 +195,9 @@ export default function TimelineSection() {
   ${isRtl
             ? `text-right after:right-0 
        hover:after:-translate-x-45 
-       hover:after:w-12 
+       after:w-20
+       hover:after:w-45 
+       hover:after:right-[-60%]
        hover:after:bg-[#8b5cf6] 
        // افکت نئون قوی‌تر در هاور
        hover:after:shadow-[0_0_10px_#8b5cf6,0_0_20px_#8b5cf6,0_0_45px_#8b5cf6]`
