@@ -79,7 +79,7 @@
         "phone": "شماره تماس معتبر نیست",
         "email": "فرمت ایمیل صحیح نیست",
         "message": "پیام شما نمی‌تواند خالی باشد",
-        "generic": "خطایی در سرور رخ داد. لطفاً مجدداً تلاش کنید." 
+        "generic": "خطایی در سرور رخ داد. لطفاً مجدداً تلاش کنید."
       }
     },
     "info": {
@@ -238,9 +238,13 @@
     "projectDesc": "توضیحات پروژه مشتری",
     "clientSubmitted": "ارسال شده توسط کاربر",
     "projectNotes": "یادداشت‌های پروژه",
+    "filterAll": "همه",
     "statusPending": "در انتظار",
     "statusAccepted": "تایید شده",
     "statusConfirmed": "قطعی شده",
-    "statusRejected": "رد شده"
+    "statusRejected": "رد شده",
+    "typeOnline": "گوگل میت (آنلاین)",
+    "typeInLocation": "حضوری (در محل)"
+    
   }
 }

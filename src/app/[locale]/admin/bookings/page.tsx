@@ -1,41 +1,35 @@
 "use client";
 
-import React, { useState, use, useEffect } from "react";
+import React, { useState, use, useEffect, useRef } from "react";
 import BookingTable, { BookingRequest } from "@/components/admin/booking/BookingTable";
 import BookingRules from "@/components/admin/booking/BookingRules";
 import ProjectDetails from "@/components/admin/booking/ProjectDetails";
 import SidePanel from "@/components/admin/booking/SidePanel";
 import { useTranslate } from "@/hooks/useTranslate";
-import { getAdminBookingsAction, updateBookingStatusAction } from "@/actions/admin-bookings";
+import { useToast } from "@/context/ToastContext";
+import { getAdminBookingsAction, updateBookingStatusAction, deleteBookingAction } from "@/actions/admin-bookings";
 
-type FilterType =  "ALL" | "PENDING" | "ACCEPTED" | "REJECTED" | "CONFIRMED";
+type FilterType = "ALL" | "PENDING" | "ACCEPTED" | "REJECTED" | "CONFIRMED";
 
-/**
- * تابع کمکی برای محاسبه زمان ثبت درخواست به صورت نسبی (مثلا: ۲ ساعت پیش)
- */
 function getRelativeTime(dateString: string, locale: string): string {
     const date = new Date(dateString);
     const now = new Date();
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-    // کمتر از یک دقیقه
     if (diffInSeconds < 60) {
         return locale === "fa" ? "لحظاتی پیش" : "Just now";
     }
 
-    // کمتر از یک ساعت
     const diffInMinutes = Math.floor(diffInSeconds / 60);
     if (diffInMinutes < 60) {
         return locale === "fa" ? `${diffInMinutes} دقیقه پیش` : `${diffInMinutes} mins ago`;
     }
 
-    // کمتر از یک شبانه‌روز
     const diffInHours = Math.floor(diffInMinutes / 60);
     if (diffInHours < 24) {
         return locale === "fa" ? `${diffInHours} ساعت پیش` : `${diffInHours} hours ago`;
     }
 
-    // بازه روزها
     const diffInDays = Math.floor(diffInHours / 24);
     if (diffInDays === 1) {
         return locale === "fa" ? "دیروز" : "Yesterday";
@@ -44,80 +38,197 @@ function getRelativeTime(dateString: string, locale: string): string {
         return locale === "fa" ? `${diffInDays} روز پیش` : `${diffInDays} days ago`;
     }
 
-    // بیشتر از یک هفته، تاریخ مطلق نمایش داده می‌شود
     return date.toLocaleDateString(locale === "fa" ? "fa-IR" : "en-US", { month: "short", day: "numeric" });
 }
-
 
 export default function AdminBookingsPage({ params }: { params: Promise<{ locale: string }> }) {
     const { locale } = use(params);
     const { t } = useTranslate();
+    const { showToast, updateToast, dismissToast } = useToast();
     const isRTL = locale === "fa";
-    // در بدنه تابع AdminBookingsPage، بعد از fetchBookings قرار دهید:
 
-const handleUpdateStatus = async (id: string, newStatus: "ACCEPTED" | "REJECTED" | "CONFIRMED") => {
-    // فرض بر این است که updateBookingStatusAction را ایمپورت کرده‌اید
-    const response = await updateBookingStatusAction(id, newStatus);
-    
-    if (response?.success) {
-        await fetchBookings(); // رفرش لیست
-    } else {
-        alert("خطا در به‌روزرسانی وضعیت");
-    }
-};
+    // رفرنس‌های هوشمند کانتکست نوتیفیکیشن
+    const loadingToastIdRef = useRef<number | null>(null);
+    const hasInitialLoadedRef = useRef<boolean>(false);
 
-    // تعریف استیت‌ها برای ذخیره درخواست‌ها و مدیریت وضعیت لودینگ
     const [requests, setRequests] = useState<BookingRequest[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [panelType, setPanelType] = useState<"RULES" | "DETAILS" | null>(null);
     const [selectedRequest, setSelectedRequest] = useState<BookingRequest | null>(null);
     const [activeFilter, setActiveFilter] = useState<FilterType>("ALL");
 
-    // تابع دریافت دیتا از سرور اکشن و فرمت‌دهی آن به ساختار BookingRequest
+    // تابع اصلی دریافت داتا با هندل کردن حالت‌های توست
     const fetchBookings = async () => {
         setLoading(true);
-        const response = await getAdminBookingsAction();
 
-        if (response.success && response.data) {
-            const formattedData: BookingRequest[] = response.data.map((item: any) => {
-                const dateObj = new Date(item.createdAt);
+        if (!hasInitialLoadedRef.current && !loadingToastIdRef.current) {
+            loadingToastIdRef.current = showToast(
+                locale === "fa" ? "در حال بارگذاری درخواست‌های رزرو..." : "Loading booking requests...",
+                "loading-white"
+            );
+        }
 
-                return {
-                    id: String(item.id),
-                    clientName: item.clientName,
-                    clientEmail: item.clientEmail,
-                    date: item.date,
-                    timeSlot: item.timeSlot,
-                    meetingType: item.meetingType,
-                    status: item.status,
+        try {
+            const response = await getAdminBookingsAction();
 
-                    // 🌟 این دو خط باید دقیقاً به این شکل باشند:
-                    clientNote: item.clientNote || "",
-                    adminNote: item.adminNote || "", // <--- این خط را اضافه کنید
+            if (response.success && response.data) {
+                const formattedData: BookingRequest[] = response.data.map((item: any) => {
+                    const dateObj = new Date(item.createdAt);
 
-                    createdAt: dateObj.toISOString(),
-                    day: dateObj.toLocaleDateString(locale === "fa" ? "fa-IR" : "en-US", { weekday: "long" }),
-                    createdLabel: getRelativeTime(item.createdAt, locale),
-                };
-            });
+                    return {
+                        id: String(item.id),
+                        clientName: item.clientName,
+                        clientEmail: item.clientEmail,
+                        date: item.date,
+                        timeSlot: item.timeSlot,
+                        meetingType: item.meetingType,
+                        status: item.status,
+                        clientNote: item.clientNote || "",
+                        adminNote: item.adminNote || "",
+                        createdAt: dateObj.toISOString(),
+                        day: dateObj.toLocaleDateString(locale === "fa" ? "fa-IR" : "en-US", { weekday: "long" }),
+                        createdLabel: getRelativeTime(item.createdAt, locale),
+                    };
+                });
 
-            setRequests(formattedData);
+                setRequests(formattedData);
 
-            // همگام‌سازی سایدبار باز شده با آخرین اطلاعات تغییر یافته در دیتابیس
-            if (selectedRequest) {
-                const updatedSelected = formattedData.find(r => r.id === selectedRequest.id);
-                if (updatedSelected) {
-                    setSelectedRequest(updatedSelected);
+                if (selectedRequest) {
+                    const updatedSelected = formattedData.find(r => r.id === selectedRequest.id);
+                    if (updatedSelected) {
+                        setSelectedRequest(updatedSelected);
+                    }
+                }
+
+                if (loadingToastIdRef.current) {
+                    updateToast(
+                        loadingToastIdRef.current,
+                        locale === "fa" ? "درخواست‌ها با موفقیت بارگذاری شدند." : "Bookings loaded successfully.",
+                        "success"
+                    );
+                    loadingToastIdRef.current = null;
+                    hasInitialLoadedRef.current = true;
+                }
+            } else {
+                if (loadingToastIdRef.current) {
+                    updateToast(
+                        loadingToastIdRef.current,
+                        locale === "fa" ? (response.error ?? "خطا در دریافت اطلاعات") : "Failed to load bookings.",
+                        "error"
+                    );
+                    loadingToastIdRef.current = null;
                 }
             }
+        } catch (error) {
+            if (loadingToastIdRef.current) {
+                updateToast(
+                    loadingToastIdRef.current,
+                    locale === "fa" ? "خطا در اتصال به دیتابیس یا سرور" : "Database or network connection failed.",
+                    "error"
+                );
+                loadingToastIdRef.current = null;
+            }
+        } finally { // 🌟 باگ سینتکس برطرف شد (اضافه شدن finally)
+            setLoading(false);
         }
-        setLoading(false);
     };
 
-    // بارگذاری لیست در اولین اجرای کامپوننت یا با تغییر زبان
+    // تغییر وضعیت دکمه‌ها با استفاده از توست و گارد امنیتی کلاینت
+    const handleUpdateStatus = async (id: string, newStatus: "ACCEPTED" | "REJECTED" | "CONFIRMED") => {
+        const target = requests.find(r => r.id === id);
+        if (target && (target.status === "CONFIRMED" || target.status === "REJECTED")) {
+            showToast(locale === "fa" ? "این جلسه قفل شده و قابل تغییر نیست." : "This session is locked.", "error");
+            return;
+        }
+
+        const actionToastId = showToast(
+            locale === "fa" ? "در حال به‌روزرسانی وضعیت..." : "Updating status...",
+            "loading-orange"
+        );
+
+        try {
+            const response = await updateBookingStatusAction(id, newStatus);
+
+            if (response?.success) {
+                await fetchBookings();
+                updateToast(
+                    actionToastId,
+                    locale === "fa" ? "وضعیت با موفقیت تغییر کرد." : "Status updated successfully.",
+                    "success"
+                );
+            } else {
+                updateToast(
+                    actionToastId,
+                    locale === "fa" ? (response?.error ?? "خطا در عملیات") : "Failed to update status.",
+                    "error"
+                );
+            }
+        } catch (error) {
+            updateToast(
+                actionToastId,
+                locale === "fa" ? "خطایی در ارتباط با سرور رخ داد." : "Server connection error.",
+                "error"
+            );
+        }
+    };
+
+    const handleDeleteBooking = async (id: string) => {
+        const isConfirmed = window.confirm(
+            locale === "fa"
+                ? "آیا از حذف کامل و قطعی این درخواست رزرو اطمینان دارید؟ این عملیات غیرقابل بازگشت است."
+                : "Are you sure you want to permanently delete this booking request? This action cannot be undone."
+        );
+
+        if (!isConfirmed) return;
+
+        const deleteToastId = showToast(
+            locale === "fa" ? "در حال حذف درخواست..." : "Deleting booking request...",
+            "loading-orange"
+        );
+
+        try {
+            const response = await deleteBookingAction(id);
+
+            if (response.success) {
+                if (selectedRequest?.id === id) {
+                    setPanelType(null);
+                    setSelectedRequest(null);
+                }
+
+                await fetchBookings();
+
+                updateToast(
+                    deleteToastId,
+                    locale === "fa" ? "درخواست با موفقیت حذف شد." : "Booking deleted successfully.",
+                    "success"
+                );
+            } else {
+                updateToast(
+                    deleteToastId,
+                    locale === "fa" ? (response.error ?? "خطا در حذف رکورد") : "Failed to delete booking.",
+                    "error"
+                );
+            }
+        } catch (error) {
+            updateToast(
+                deleteToastId,
+                locale === "fa" ? "خطا در ارتباط با سرور رخ داد." : "Server connection error.",
+                "error"
+            );
+        }
+    };
+
     useEffect(() => {
         fetchBookings();
     }, [locale]);
+
+    useEffect(() => {
+        return () => {
+            if (loadingToastIdRef.current) {
+                dismissToast(loadingToastIdRef.current);
+            }
+        };
+    }, [dismissToast]);
 
     const handleOpenDetails = (req: BookingRequest) => {
         setSelectedRequest(req);
@@ -129,13 +240,12 @@ const handleUpdateStatus = async (id: string, newStatus: "ACCEPTED" | "REJECTED"
         { id: "PENDING", label: t("adminBooking.statusPending") || "Pending" },
         { id: "ACCEPTED", label: t("adminBooking.statusAccepted") || "Accepted" },
         { id: "CONFIRMED", label: t("adminBooking.statusConfirmed") || "Confirmed" },
+        { id: "REJECTED", label: t("adminBooking.statusRejected") || "Rejected" }, // 🌟 افزوده شدن وضعیت رد شده به تب‌ها
     ];
 
     return (
         <div dir={isRTL ? "rtl" : "ltr"} className="min-h-screen bg-[#07070a] py-10 px-4 md:px-8 text-white">
             <div className="max-w-7xl mx-auto flex flex-col gap-6">
-
-                {/* هدر صفحه */}
                 <div className="flex justify-between items-center">
                     <div className="flex flex-col gap-1">
                         <h1 className="text-2xl font-bold tracking-tight text-white">
@@ -150,15 +260,15 @@ const handleUpdateStatus = async (id: string, newStatus: "ACCEPTED" | "REJECTED"
                     </button>
                 </div>
 
-                {/* تب‌های فیلتر */}
-                <div className="flex gap-2 bg-[#111118]/50 p-1 rounded-xl w-fit border border-white/5">
+                {/* 🌟 باگ اسکرول تب‌ها در موبایل با این کلاس‌ها فیکس شد */}
+                <div className="flex gap-2 bg-[#111118]/50 p-1 rounded-xl w-full md:w-fit border border-white/5 overflow-x-auto [&::-webkit-scrollbar]:hidden">
                     {filters.map((f) => (
                         <button
                             key={f.id}
                             onClick={() => setActiveFilter(f.id)}
-                            className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${activeFilter === f.id
-                                ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
-                                : "text-gray-500 hover:text-gray-300"
+                            className={`shrink-0 whitespace-nowrap px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${activeFilter === f.id
+                                    ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                    : "text-gray-500 hover:text-gray-300"
                                 }`}
                         >
                             {f.label}
@@ -166,9 +276,8 @@ const handleUpdateStatus = async (id: string, newStatus: "ACCEPTED" | "REJECTED"
                     ))}
                 </div>
 
-                {/* مدیریت لودینگ شیک نئونی و نمایش جدول */}
                 <div className="w-full">
-                    {loading ? (
+                    {loading && requests.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-24 gap-4 bg-[#0d0d12]/40 rounded-2xl border border-white/5">
                             <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
                             <span className="text-xs text-gray-500 italic">
@@ -182,24 +291,20 @@ const handleUpdateStatus = async (id: string, newStatus: "ACCEPTED" | "REJECTED"
                             selectedId={selectedRequest?.id || null}
                             onSelectRequest={handleOpenDetails}
                             filter={activeFilter}
-                            onUpdateStatus={handleUpdateStatus} // این خط اضافه شود
+                            onUpdateStatus={handleUpdateStatus}
+                            onDeleteBooking={handleDeleteBooking}
                         />
                     )}
                 </div>
             </div>
 
-            {/* پنل کشویی کناری */}
-            <SidePanel
-                isOpen={panelType !== null}
-                onClose={() => setPanelType(null)}
-                title={panelType === "RULES" ? t("adminBooking.globalRules") : t("adminBooking.projectDesc")}
-            >
+            <SidePanel isOpen={panelType !== null} onClose={() => setPanelType(null)} title={panelType === "RULES" ? t("adminBooking.globalRules") : t("adminBooking.projectDesc")}>
                 {panelType === "RULES" && <BookingRules locale={locale} />}
                 {panelType === "DETAILS" && (
                     <ProjectDetails
                         locale={locale}
                         selectedRequest={selectedRequest}
-                        onActionSuccess={fetchBookings} // رفرش آنی داده‌ها پس از تایید یا رد درخواست در سایدبار
+                        onActionSuccess={fetchBookings}
                     />
                 )}
             </SidePanel>

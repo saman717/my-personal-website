@@ -239,6 +239,10 @@
     "projectNotes": "Project Notes",
     "statusPending": "Pending",
     "statusAccepted": "Accepted",
-    "statusConfirmed": "Confirmed"
+    "statusConfirmed": "Confirmed",
+    "filterAll": "all",
+    "statusRejected": "Rejected",
+    "typeOnline": "Google Meet",
+    "typeInLocation": "In Location"
   }
 }
