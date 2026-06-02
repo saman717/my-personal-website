@@ -48,7 +48,7 @@ export default function AdminLayout({
                                 : "-translate-x-false"
                         }`}
                 >
-                    {/* <Sidebar locale={locale} /> */}
+                    <Sidebar locale={locale} />
                 </div>
 
                 {/* content */}
