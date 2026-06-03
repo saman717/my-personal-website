@@ -26,29 +26,34 @@ export default function AdminLayout({
         >
             <ReactQueryProvider>
                 {/* overlay موبایل */}
+                {/* 🪟 بک‌دراپ تاریک برای موبایل (وقتی منو بازه) */}
                 {mobileMenuOpen && (
                     <div
                         onClick={() => setMobileMenuOpen(false)}
-                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300"
                     />
                 )}
 
-                {/* sidebar دسکتاپ */}
+                {/* 💻 Sidebar دسکتاپ (همیشه ثابت) */}
                 <div className="hidden md:flex">
                     <Sidebar locale={locale} />
                 </div>
 
-                {/* sidebar موبایل */}
+                {/* 📱 Sidebar موبایل (مخفی شونده با انیمیشن) */}
                 <div
                     className={`fixed top-0 ${isRTL ? "right-0" : "left-0"
                         } h-screen w-[280px] z-50 transform transition-transform duration-300 md:hidden ${mobileMenuOpen
                             ? "translate-x-0"
                             : isRTL
                                 ? "translate-x-full"
-                                : "-translate-x-false"
+                                : "-translate-x-full" // 🌟 باگ تایپی اینجا فیکس شد
                         }`}
                 >
-                    <Sidebar locale={locale} />
+                    {/* 🌟 پراپ onClose پاس داده شد تا با کلیک روی لینک‌ها، منو خودکار بسته بشه */}
+                    <Sidebar
+                        locale={locale}
+                        onClose={() => setMobileMenuOpen(false)}
+                    />
                 </div>
 
                 {/* content */}
