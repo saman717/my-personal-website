@@ -6,7 +6,7 @@
     "portfolio": "Portfolio",
     "blog": "Blog",
     "contact": "Contact",
-    "appointment": "Appointment",
+    "Booking": "Booking",
     "download_resume": "Download Resume"
   },
   "home": {
@@ -134,7 +134,7 @@
       "media": "Media",
       "settings": "Settings",
       "tasks": "Tasks",
-      "appointments": "Appointments",
+      "Booking": "Booking",
       "jobHunt": "Job Hunt CRM",
       "growth": "Personal Growth",
       "bots": "Bot Hub",
@@ -225,7 +225,7 @@
     }
   },
   "adminBooking": {
-    "title": "Booking Requests & Meeting Management",
+    "title": "Booking Requests",
     "tableClient": "Client",
     "tableTime": "Time Slot",
     "tableCreated": "Requested",

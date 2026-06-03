@@ -6,7 +6,7 @@
     "portfolio": "نمونه کارها",
     "blog": "مقالات",
     "contact": "تماس",
-    "appointment": "ملاقات",
+    "Booking": "ملاقات",
     "download_resume": "دانلود رزومه"
   },
   "home": {
@@ -135,7 +135,7 @@
       "media": "رسانه‌ها",
       "settings": "تنظیمات",
       "tasks": "تسک‌ها",
-      "appointments": "ملاقات‌ها",
+      "Booking": "ملاقات‌ها",
       "jobHunt": "ردیاب مهاجرت",
       "growth": "توسعه فردی",
       "bots": "ربات‌ها",

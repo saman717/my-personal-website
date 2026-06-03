@@ -1,15 +1,27 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import NavLink from "./NavLink";
 import Link from "next/link";
 import { useTranslate } from "@/hooks/useTranslate";
 import { useUnreadCount } from "@/hooks/useUnreadCount";
+import { usePathname } from "next/navigation"; // 🌟 اضافه شد برای تشخیص تغییر صفحه
 
-export default function Sidebar({ locale }: { locale: string }) {
+// 🌟 پراپ onClose اضافه شد تا لی‌آوت اصلی بتونه سایدبار رو ببنده
+export default function Sidebar({ locale, onClose }: { locale: string; onClose?: () => void }) {
     const { t } = useTranslate();
     const isRTL = locale === 'fa';
     const { data: unreadCount = 0 } = useUnreadCount();
+    
+    // گرفتن مسیر فعلی
+    const pathname = usePathname();
+
+    // 🚀 Best Practice: هر زمان که URL تغییر کرد (کاربر روی لینکی کلیک کرد)، سایدبار موبایل بسته شود
+    useEffect(() => {
+        if (onClose) {
+            onClose();
+        }
+    }, [pathname]);
 
     return (
         <aside
@@ -59,7 +71,7 @@ export default function Sidebar({ locale }: { locale: string }) {
                             {t("admin.categories.personal")}
                         </span>
                         <NavLink href={`/${locale}/admin/tasks`}>{t("admin.menu.tasks")}</NavLink>
-                        <NavLink href={`/${locale}/admin/bookings`}>{t("admin.menu.appointments")}</NavLink>
+                        <NavLink href={`/${locale}/admin/bookings`}>{t("admin.menu.Booking")}</NavLink>
                         <NavLink href={`/${locale}/admin/job-hunt`}>{t("admin.menu.jobHunt")}</NavLink>
                         <NavLink href={`/${locale}/admin/growth`}>{t("admin.menu.growth")}</NavLink>
                         <NavLink href={`/${locale}/admin/bots`}>{t("admin.menu.bots")}</NavLink>
@@ -73,6 +85,7 @@ export default function Sidebar({ locale }: { locale: string }) {
             <div className="pt-2.5 border-t border-white/5">
                 <Link
                     href={`/${locale}`}
+                    onClick={onClose} // 🌟 اضافه کردن onClose برای اطمینان از بسته شدن سایدبار هنگام خروج
                     className="flex items-center justify-center gap-1 w-full px-4 py-3 rounded-xl text-xs font-medium text-white border border-red-500/20 bg-red-500/5 hover:border-red-500 hover:bg-red-500/10 transition-all duration-300 shadow-[0_0_15px_rgba(239,68,68,0.02)] hover:shadow-[0_0_20px_rgba(239,68,68,0.15)]"
                 >
                     🚪 {t("admin.exit")}
