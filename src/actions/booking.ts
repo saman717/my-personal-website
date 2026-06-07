@@ -1,29 +1,84 @@
-// app/actions/booking.ts
 "use server";
 
-import { db } from "@/db";
-import { bookings } from "@/db/schema";
-import { eq, and, inArray } from "drizzle-orm";
-
-// لیست ثابت و مرجع ساعت‌های کاری شما در روز
-const MASTER_TIME_SLOTS = [
-  "09:00 AM",
-  "10:30 AM",
-  "01:00 PM",
-  "02:30 PM",
-  "03:00 PM",
-  "04:30 PM"
-];
+import { db } from "../db/index";
+// 🌟 ایمپورت جدول یکپارچه‌ی tasks به جای adminTasks
+import { bookings, blockedDates, tasks } from "@/db/schema";
+import { eq, and, inArray, isNotNull, between } from "drizzle-orm";
+import { MASTER_TIME_SLOTS } from "@/lib/calendar.config";
 
 /**
- * ۱. دریافت لیست ساعت‌های خالی برای یک تاریخ مشخص
- * @param dateStr فرمت: "YYYY-MM-DD"
+ * ۱. دریافت وضعیت کل ماه (جلوگیری از N+1 Problem در تقویم)
+ */
+export async function getMonthAvailabilityAction(year: number, month: number) {
+  try {
+    const formattedMonth = String(month).padStart(2, "0");
+    const startDate = `${year}-${formattedMonth}-01`;
+    const lastDayOfMonth = new Date(year, month, 0).getDate();
+    const endDate = `${year}-${formattedMonth}-${String(lastDayOfMonth).padStart(2, "0")}`;
+
+    // روزهای بلاک شده
+    const blocked = await db.select({ date: blockedDates.date }).from(blockedDates)
+      .where(between(blockedDates.date, startDate, endDate));
+    const blockedDays = blocked.map((b) => b.date);
+
+    // رزروهای تایید شده
+    const monthBookings = await db.select({ date: bookings.date, timeSlot: bookings.timeSlot }).from(bookings)
+      .where(and(between(bookings.date, startDate, endDate), inArray(bookings.status, ["ACCEPTED", "CONFIRMED"])));
+
+    // تسک‌های زمان‌دار ادمین که قابلیت بلاک کردن دارند
+    const monthTasks = await db.select({ date: tasks.date, timeSlot: tasks.timeSlot }).from(tasks)
+      .where(
+        and(
+          between(tasks.date, startDate, endDate),
+          isNotNull(tasks.timeSlot),
+          eq(tasks.isBlocking, true) // 🌟 گارد امنیتی
+        )
+      );
+
+    const slotCounts: Record<string, Set<string>> = {};
+
+    monthBookings.forEach((b) => {
+      if (!slotCounts[b.date]) slotCounts[b.date] = new Set();
+      slotCounts[b.date].add(b.timeSlot);
+    });
+
+    monthTasks.forEach((t) => {
+      if (!slotCounts[t.date]) slotCounts[t.date] = new Set();
+      if (t.timeSlot) slotCounts[t.date].add(t.timeSlot);
+    });
+
+    const fullDays: string[] = [];
+    const TOTAL_SLOTS = MASTER_TIME_SLOTS.length;
+
+    for (const [date, slots] of Object.entries(slotCounts)) {
+      if (slots.size >= TOTAL_SLOTS) fullDays.push(date);
+    }
+
+    return { success: true, blockedDays, fullDays };
+  } catch (error) {
+    console.error("Error in getMonthAvailabilityAction:", error);
+    return { success: false, blockedDays: [], fullDays: [], error: "خطا در بارگذاری تقویم ماه" };
+  }
+}
+
+/**
+ * ۲. دریافت لیست ساعت‌های خالی برای یک تاریخ مشخص (ارتقا یافته)
  */
 export async function getAvailableSlotsAction(dateStr: string) {
   try {
-    if (!dateStr) return { success: false, slots: [] };
+    if (!dateStr) return { success: false, slots: [] as string[] };
 
-    // فچ کردن نوبت‌هایی که قبلاً تایید شده یا قطعی هستند
+    // 🛑 لایه ۱: آیا روز کلاً توسط ادمین بلاک شده است؟
+    const isDayBlocked = await db
+      .select()
+      .from(blockedDates)
+      .where(eq(blockedDates.date, dateStr));
+
+    if (isDayBlocked.length > 0) {
+      return { success: true, slots: [] as string[], message: "این روز تعطیل است" };
+    }
+
+    // 🙋‍♂️ لایه ۲: فچ کردن نوبت‌های تایید شده کاربران
     const takenBookings = await db
       .select({ timeSlot: bookings.timeSlot })
       .from(bookings)
@@ -34,11 +89,25 @@ export async function getAvailableSlotsAction(dateStr: string) {
         )
       );
 
-    const takenSlots = takenBookings.map((b) => b.timeSlot);
+    // 👨‍💻 لایه ۳: فچ کردن تسک‌های ادمین که ساعت براشون فیکس شده و بلاک‌کننده هستند
+    const takenTasks = await db
+      .select({ timeSlot: tasks.timeSlot })
+      .from(tasks)
+      .where(
+        and(
+          eq(tasks.date, dateStr),
+          isNotNull(tasks.timeSlot),
+          eq(tasks.isBlocking, true) // 🌟 گارد امنیتی
+        )
+      );
 
-    // فیلتر کردن ساعت‌های اصلی: فقط ساعت‌هایی که پر نشده‌اند برگردانده می‌شوند
+    const allTakenSlots = new Set([
+      ...takenBookings.map((b) => b.timeSlot),
+      ...takenTasks.map((t) => t.timeSlot!)
+    ]);
+
     const availableSlots = MASTER_TIME_SLOTS.filter(
-      (slot) => !takenSlots.includes(slot)
+      (slot) => !allTakenSlots.has(slot)
     );
 
     return { success: true, slots: availableSlots };
@@ -49,7 +118,7 @@ export async function getAvailableSlotsAction(dateStr: string) {
 }
 
 /**
- * ۲. ثبت نهایی درخواست رزرو وقت در دیتابیس Supabase
+ * ۳. ثبت نهایی درخواست رزرو وقت (همراه با بررسی امنیتی ۳ لایه)
  */
 interface SubmitBookingInput {
   clientName: string;
@@ -62,12 +131,32 @@ interface SubmitBookingInput {
 
 export async function submitBookingRequestAction(data: SubmitBookingInput) {
   try {
-    // اعتبارسنجی اولیه سرور
     if (!data.clientName || !data.clientEmail || !data.date || !data.timeSlot) {
       return { success: false, error: "تمامی فیلدهای اجباری باید پر شوند." };
     }
 
-    // چک کردن مجدد تداخل زمانی (Race Condition Check)
+    // 🛡️ لایه امنیتی ۱: آیا ادمین دقیقاً همین الان روز رو بلاک نکرد؟
+    const isBlockedCheck = await db.select().from(blockedDates).where(eq(blockedDates.date, data.date));
+    if (isBlockedCheck.length > 0) {
+      return { success: false, error: "متأسفانه این روز توسط مدیر بسته شد. لطفاً روز دیگری انتخاب کنید." };
+    }
+
+    // 🛡️ لایه امنیتی ۲: آیا ادمین دقیقاً همین الان این ساعت رو برای تسک بلاک‌کننده‌ی خودش برنداشت؟
+    // 🌟 اینجا کلمه‌ی adminTasks با جدول جدید tasks جایگزین شد
+    const adminTaskCheck = await db.select().from(tasks)
+      .where(
+        and(
+          eq(tasks.date, data.date), 
+          eq(tasks.timeSlot, data.timeSlot),
+          eq(tasks.isBlocking, true) // 🌟 گارد امنیتی اضافه شد
+        )
+      );
+
+    if (adminTaskCheck.length > 0) {
+      return { success: false, error: "متأسفانه این زمان توسط مدیر رزرو شد. لطفاً زمان دیگری انتخاب کنید." };
+    }
+
+    // 🛡️ لایه امنیتی ۳: چک کردن مجدد تداخل زمانی کاربران (Race Condition)
     const doubleBookingCheck = await db
       .select()
       .from(bookings)
@@ -80,13 +169,13 @@ export async function submitBookingRequestAction(data: SubmitBookingInput) {
       );
 
     if (doubleBookingCheck.length > 0) {
-      return { 
-        success: false, 
-        error: "متأسفانه این زمان در همین لحظه توسط شخص دیگری رزرو شد. لطفا زمان دیگری انتخاب کنید." 
+      return {
+        success: false,
+        error: "متأسفانه این زمان در همین لحظه توسط شخص دیگری رزرو شد. لطفا زمان دیگری انتخاب کنید."
       };
     }
 
-    // ثبت در جدول bookings دیتابیس Supabase
+    // ثبت نهایی در دیتابیس
     await db.insert(bookings).values({
       clientName: data.clientName,
       clientEmail: data.clientEmail,
@@ -94,7 +183,7 @@ export async function submitBookingRequestAction(data: SubmitBookingInput) {
       timeSlot: data.timeSlot,
       meetingType: data.meetingType,
       clientNote: data.clientNote || null,
-      status: "PENDING", // وضعیت اولیه: در انتظار تایید ادمین
+      status: "PENDING",
     });
 
     return { success: true };

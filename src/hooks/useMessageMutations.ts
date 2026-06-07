@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/react-query/queryKeys";
 import { toggleMessageReadStatus, deleteMessageFromDb } from "@/actions/messages";
 import { useToast } from "@/context/ToastContext";
-import { MessageType } from "@/types/types";
+import { MessageType } from "@/types/contact";
 
 export function useMessageMutations() {
   const queryClient = useQueryClient();

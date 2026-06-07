@@ -58,6 +58,7 @@ export default function BookingTable({ locale, requests, selectedId, onSelectReq
                             const isSelected = selectedId === req.id;
                             const isActionable = req.status !== "CONFIRMED" && req.status !== "REJECTED";
 
+                            const newLocal = "flex-[3] md:flex-none opacity-100 pointer-events-auto";
                             return (
                                 <tr
                                     key={req.id}
@@ -137,7 +138,7 @@ export default function BookingTable({ locale, requests, selectedId, onSelectReq
                                                     {t("adminBooking.tableStatus")}
                                                 </span>
 
-                                                <div className="w-auto md:w-[105px] flex justify-end md:justify-center shrink-0">
+                                                <div className="w-auto md:w-26.25 flex justify-end md:justify-center shrink-0">
                                                     {req.status === "PENDING" && (
                                                         <span className="px-3 md:w-full h-7 md:h-6 flex items-center justify-center text-[10px] font-bold tracking-wider uppercase rounded-lg md:rounded bg-amber-500/10 border border-amber-500/20 text-amber-400">
                                                             {t("adminBooking.statusPending")}
@@ -170,17 +171,17 @@ export default function BookingTable({ locale, requests, selectedId, onSelectReq
 
                                             {/* دکمه‌های عملیاتی */}
                                             <div className="flex items-center w-full md:w-auto gap-2 shrink-0">
-                                                <div className={`flex items-center gap-2 md:gap-1.5 md:w-[100px] md:border-l border-white/5 md:pl-2 md:shrink-0 transition-all duration-200 ${isActionable
-                                                        ? "flex-[3] md:flex-none opacity-100 pointer-events-auto"
+                                                <div className={`flex items-center gap-2 md:gap-1.5 md:w-25 md:border-l border-white/5 md:pl-2 md:shrink-0 transition-all duration-200 ${isActionable
+                                                        ? newLocal
                                                         : "hidden md:flex md:flex-none opacity-0 pointer-events-none select-none"
                                                     }`}>
-                                                    <button onClick={(e) => { e.stopPropagation(); onUpdateStatus(req.id, "ACCEPTED"); }} className="flex-1 md:flex-none md:w-[30px] h-10 md:h-8 flex justify-center items-center rounded-xl md:rounded text-emerald-400 bg-emerald-500/10 md:bg-transparent hover:bg-emerald-500/20 transition-all active:scale-95" title="Accept">
+                                                    <button onClick={(e) => { e.stopPropagation(); onUpdateStatus(req.id, "ACCEPTED"); }} className="flex-1 md:flex-none md:w-7.5 h-10 md:h-8 flex justify-center items-center rounded-xl md:rounded text-emerald-400 bg-emerald-500/10 md:bg-transparent hover:bg-emerald-500/20 transition-all active:scale-95" title="Accept">
                                                         <svg className="w-5 h-5 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                                                     </button>
-                                                    <button onClick={(e) => { e.stopPropagation(); onUpdateStatus(req.id, "CONFIRMED"); }} className="flex-1 md:flex-none md:w-[30px] h-10 md:h-8 flex justify-center items-center rounded-xl md:rounded text-teal-400 bg-teal-500/10 md:bg-transparent hover:bg-teal-500/20 transition-all active:scale-95" title="Confirm Final">
+                                                    <button onClick={(e) => { e.stopPropagation(); onUpdateStatus(req.id, "CONFIRMED"); }} className="flex-1 md:flex-none md:w-7.5 h-10 md:h-8 flex justify-center items-center rounded-xl md:rounded text-teal-400 bg-teal-500/10 md:bg-transparent hover:bg-teal-500/20 transition-all active:scale-95" title="Confirm Final">
                                                         <svg className="w-5 h-5 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>
                                                     </button>
-                                                    <button onClick={(e) => { e.stopPropagation(); onUpdateStatus(req.id, "REJECTED"); }} className="flex-1 md:flex-none md:w-[30px] h-10 md:h-8 flex justify-center items-center rounded-xl md:rounded text-red-400 bg-red-500/10 md:bg-transparent hover:bg-red-500/20 transition-all active:scale-95" title="Reject">
+                                                    <button onClick={(e) => { e.stopPropagation(); onUpdateStatus(req.id, "REJECTED"); }} className="flex-1 md:flex-none md:w-7.5 h-10 md:h-8 flex justify-center items-center rounded-xl md:rounded text-red-400 bg-red-500/10 md:bg-transparent hover:bg-red-500/20 transition-all active:scale-95" title="Reject">
                                                         <svg className="w-5 h-5 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                                                     </button>
                                                 </div>

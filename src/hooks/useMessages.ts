@@ -3,7 +3,7 @@ import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/react-query/queryKeys";
 import { getContactMessages } from "@/actions/messages";
-import { MessageType } from "@/types/types";
+import { MessageType } from "@/types/contact";
 
 const ITEMS_PER_PAGE = 4;
 

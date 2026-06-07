@@ -4,7 +4,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { IconCircle, IconCheck } from "./icons";
 import { useTranslate } from "@/hooks/useTranslate";
-import { MessageType } from "@/types/types";
+import { MessageType } from "@/types/contact";
 
 interface MessageItemProps {
   msg: MessageType;

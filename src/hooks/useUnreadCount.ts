@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/react-query/queryKeys";
-import { MessageType } from "@/types/types";
+import { MessageType } from "@/types/contact";
 
 export function useUnreadCount() {
   return useQuery({
