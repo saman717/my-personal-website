@@ -3,7 +3,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslate } from "@/hooks/useTranslate";
-import { MessageType } from "@/types/types"; // اضافه کردن تایپ اصلی
+import { MessageType } from "@/types"; // اضافه کردن تایپ اصلی
 
 interface ModalProps {
   message: MessageType | null; // استفاده از تایپ استاندارد به جای اینترفیس دستی

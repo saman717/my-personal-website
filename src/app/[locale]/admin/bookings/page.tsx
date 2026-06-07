@@ -8,6 +8,7 @@ import SidePanel from "@/components/admin/booking/SidePanel";
 import { useTranslate } from "@/hooks/useTranslate";
 import { useToast } from "@/context/ToastContext";
 import { getAdminBookingsAction, updateBookingStatusAction, deleteBookingAction } from "@/actions/admin-bookings";
+import AdminCalendarManager from "@/components/admin/AdminCalendarManager";
 
 type FilterType = "ALL" | "PENDING" | "ACCEPTED" | "REJECTED" | "CONFIRMED";
 
@@ -244,7 +245,8 @@ export default function AdminBookingsPage({ params }: { params: Promise<{ locale
     ];
 
     return (
-        <div dir={isRTL ? "rtl" : "ltr"} className="min-h-screen bg-[#07070a] py-10 px-4 md:px-8 text-white">
+        <div dir={isRTL ? "rtl" : "ltr"} className="min-h-screen bg-[#07070a] py-10 px-4 md:px-8 text-white space-y-8">
+            <AdminCalendarManager/>
             <div className="max-w-7xl mx-auto flex flex-col gap-6">
                 <div className="flex justify-between items-center">
                     <div className="flex flex-col gap-1">
