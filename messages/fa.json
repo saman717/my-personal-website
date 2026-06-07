@@ -6,7 +6,7 @@
     "portfolio": "نمونه کارها",
     "blog": "مقالات",
     "contact": "تماس",
-    "appointment": "ملاقات",
+    "Booking": "ملاقات",
     "download_resume": "دانلود رزومه"
   },
   "home": {
@@ -79,7 +79,7 @@
         "phone": "شماره تماس معتبر نیست",
         "email": "فرمت ایمیل صحیح نیست",
         "message": "پیام شما نمی‌تواند خالی باشد",
-        "generic": "خطایی در سرور رخ داد. لطفاً مجدداً تلاش کنید." 
+        "generic": "خطایی در سرور رخ داد. لطفاً مجدداً تلاش کنید."
       }
     },
     "info": {
@@ -135,7 +135,7 @@
       "media": "رسانه‌ها",
       "settings": "تنظیمات",
       "tasks": "تسک‌ها",
-      "appointments": "ملاقات‌ها",
+      "Booking": "ملاقات‌ها",
       "jobHunt": "ردیاب مهاجرت",
       "growth": "توسعه فردی",
       "bots": "ربات‌ها",
@@ -238,9 +238,89 @@
     "projectDesc": "توضیحات پروژه مشتری",
     "clientSubmitted": "ارسال شده توسط کاربر",
     "projectNotes": "یادداشت‌های پروژه",
+    "filterAll": "همه",
     "statusPending": "در انتظار",
     "statusAccepted": "تایید شده",
     "statusConfirmed": "قطعی شده",
-    "statusRejected": "رد شده"
+    "statusRejected": "رد شده",
+    "typeOnline": "گوگل میت (آنلاین)",
+    "typeInLocation": "حضوری (در محل)"
+  },
+  "adminTask": {
+    "AdminTasksPage": {
+      "title": "🧠 سیستم عامل زندگی (Life OS)",
+      "description": "برنامه‌ریزی دقیق روزانه (Timeboxing) و مدیریت کارهای شناور.",
+      "new_task_btn": "وظیفه جدید",
+      "loading": "در حال لود تایم‌لاین روز..."
+    },
+    "TaskModal": {
+      "title_create": "تنظیم کایزن روزانه برای {date}",
+      "title_edit": "مشاهده و ویرایش وظیفه",
+      "task_title_label": "عنوان ماموریت *",
+      "task_title_placeholder": "چه هدفی را دنبال می‌کنی؟...",
+      "time_slot_label": "زمان اجرا",
+      "floating_slot": "☁️ شناور (بدون ساعت)",
+      "priority_label": "اولویت اقدام",
+      "priority_low": "🔵 کم",
+      "priority_medium": "🟡 متوسط",
+      "priority_high": "🔴 فوری",
+      "duration_label": "مدت تخصیص (دقیقه)",
+      "recurrence_label": "تکرار وظیفه",
+      "recurrence_none": "📌 یک‌بار",
+      "recurrence_daily": "🔄 هر روز",
+      "recurrence_weekly": "📅 هر هفته",
+      "recurrence_monthly": "🌙 هر ماه",
+      "category_label": "دسته‌بندی موضوع",
+      "category_work": "💻 کاری / پروژه‌ها",
+      "category_personal": "👤 شخصی / روتین",
+      "category_learning": "🧠 یادگیری / مطالعه",
+      "category_health": "🏃‍♂️ ورزشی / سلامتی",
+      "category_free": "🕊️ آزاد / متفرقه",
+      "energy_label": "سطح انرژی موردنیاز",
+      "energy_low": "🟢 کم (سبک)",
+      "energy_medium": "🟡 متوسط",
+      "energy_high": "🔴 زیاد (تمرکز بالا)",
+      "description_label": "توضیحات استراتژیک",
+      "description_placeholder": "لینک مستندات یا گام‌های اجرا...",
+      "blocking_title": "مسدودسازی تقویم رزرو کلاینت‌ها",
+      "blocking_desc": "آیا این بلوک زمانی مانع برگزاری جلسات عمومی شما می‌شود؟",
+      "btn_delete": "🗑️ حذف وظیفه",
+      "btn_cancel": "انصراف",
+      "btn_submit_create": "ذخیره در سیستم عامل",
+      "btn_submit_edit": "اعمال تغییرات",
+      "btn_submitting": "در حال ثبت...",
+      "alert_delete_confirm": "آیا از حذف این وظیفه مطمئن هستید؟",
+      "alert_error": "خطایی رخ داد"
+    },
+    "TimelineBoard": {
+      "title": "تایم‌لاین اختصاصی ({date})",
+      "minutes_filled": "{minutes} دقیقه پر شده",
+      "add_another_task": "+ افزودن وظیفه‌ی دیگر در این ساعت (ظرفیت باقی‌مانده: {minutes} دقیقه)",
+      "add_task": "+ افزودن وظیفه در این ساعت"
+    },
+    "TaskCard": {
+      "minutes": "{count} دقیقه",
+      "done_label": "انجام شد",
+      "achieved_label": "به هدف رسیدم",
+      "blocking": "🔒 مسدودکننده",
+      "categories": {
+        "work": "💻 کاری",
+        "personal": "👤 شخصی",
+        "learning": "🧠 یادگیری",
+        "health": "🏃‍♂️ ورزشی",
+        "free": "🕊️ آزاد"
+      },
+      "energy": {
+        "prefix": "⚡ انرژی",
+        "low": "کم",
+        "medium": "متوسط",
+        "high": "زیاد"
+      }
+    },
+    "FloatingBoard": {
+      "title": "☁️ کارهای شناور امروز",
+      "empty_message": "همه کارهای امروز زمان‌بندی شده‌اند",
+      "footer_hint": "کارهای شناور وظایفی هستند که ساعت مشخصی ندارند اما باید در طول این روز انجام شوند."
+    }
   }
 }

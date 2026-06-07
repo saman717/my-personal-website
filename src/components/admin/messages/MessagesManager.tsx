@@ -7,7 +7,7 @@ import { useTranslate } from "@/hooks/useTranslate";
 import { IconLoader } from "./icons";
 import { useMessages } from "@/hooks/useMessages";
 import { useMessageMutations } from "@/hooks/useMessageMutations";
-import { MessageType } from "@/types/types";
+import { MessageType } from "@/types/contact";
 
 
 import MessageFilters from "./MessageFilters";

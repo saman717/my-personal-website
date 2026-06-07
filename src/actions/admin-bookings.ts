@@ -1,7 +1,6 @@
-// src/actions/admin-bookings.ts
 "use server";
 
-import { db } from "@/db";
+import { db } from "../db/index";
 import { bookings } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -24,17 +23,37 @@ export async function getAdminBookingsAction() {
 }
 
 /**
- * ۲. تغییر وضعیت یک رزرو (تایید یا رد)
- * ✨ فیکس شد: تغییر تایپ bookingId به string به دلیل استفاده از UUID در دیتابیس
+ * ۲. تغییر وضعیت یک رزرو (تایید یا رد یا قفل نهایی)
+ * 🔒 لایه امنیتی سرور اضافه شد: جلوگیری از دستکاری رکوردهای نهایی شده
  */
-export async function updateBookingStatusAction(bookingId: string, newStatus:"ACCEPTED" | "REJECTED" | "CONFIRMED") {
+export async function updateBookingStatusAction(bookingId: string, newStatus: "ACCEPTED" | "REJECTED" | "CONFIRMED") {
   try {
+    // ۱. 🔒 استفاده از متد پایه و ۱۰۰٪ امن select برای دریافت وضعیت فعلی رکورد
+    const existingBookings = await db
+      .select()
+      .from(bookings)
+      .where(eq(bookings.id, bookingId))
+      .limit(1); // همیشه حداکثر یک رکورد می‌خواهیم
+
+    const currentBooking = existingBookings[0];
+
+    // اگر درخواستی با این آیدی پیدا نشد
+    if (!currentBooking) {
+      return { success: false, error: "درخواست رزرو یافت نشد." };
+    }
+
+    // ۲. 🔒 گارد امنیتی سرور: اگر جلسه از قبل نهایی یا رد شده بود، اجازه تغییر نده
+    if (currentBooking.status === "CONFIRMED" || currentBooking.status === "REJECTED") {
+      return { success: false, error: "این جلسه نهایی یا رد شده است و وضعیت آن قابل تغییر نیست." };
+    }
+
+    // ۳. انجام آپدیت نهایی دیتابیس در صورت معتبر بودن کلیدها
     await db
       .update(bookings)
       .set({ status: newStatus })
       .where(eq(bookings.id, bookingId));
 
-    // بروزرسانی کش نکست‌جی‌اس برای دیدن آنی تغییرات
+    // بروزرسانی آنی کش نکست‌جی‌اس برای کلاینت
     revalidatePath("/admin/bookings");
     return { success: true };
   } catch (error) {
@@ -45,13 +64,12 @@ export async function updateBookingStatusAction(bookingId: string, newStatus:"AC
 
 /**
  * ۳. بروزرسانی یا ذخیره یادداشت اختصاصی ادمین
- * ✨ فیکس شد: تغییر تایپ به string و انطباق نام فیلد دیتابیس به adminNote (بدون s)
  */
 export async function updateAdminNotesAction(bookingId: string, notes: string) {
   try {
     await db
       .update(bookings)
-      .set({ adminNote: notes }) // 🌟 این بخش دقیقاً به ستون adminNote در اسکیمای شما متصل شد
+      .set({ adminNote: notes })
       .where(eq(bookings.id, bookingId));
 
     // رفرش کردن کش مسیر برای بروزرسانی همزمان فرانت‌اند
@@ -60,5 +78,22 @@ export async function updateAdminNotesAction(bookingId: string, notes: string) {
   } catch (error) {
     console.error("Error updating admin notes:", error);
     return { success: false, error: "خطا در ذخیره یادداشت ادمین" };
+  }
+}
+/**
+ * ۴. حذف کامل و قطعی یک رزرو از دیتابیس
+ */
+export async function deleteBookingAction(bookingId: string) {
+  try {
+    await db
+      .delete(bookings)
+      .where(eq(bookings.id, bookingId));
+
+    // رفرش کردن کش مسیر برای بروزرسانی فوری کلاینت
+    revalidatePath("/admin/bookings");
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting booking:", error);
+    return { success: false, error: "خطا در حذف درخواست از دیتابیس" };
   }
 }

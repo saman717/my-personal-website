@@ -2,7 +2,7 @@
 
 import React, { useRef } from "react";
 import { useForm } from "react-hook-form";
-import { ContactFormData } from "@/types/types";
+import { ContactFormData } from "@/types/contact";
 import { sendContactMessage } from "@/actions/contact";
 import { useToast } from "@/context/ToastContext";
 

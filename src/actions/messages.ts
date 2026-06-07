@@ -1,6 +1,6 @@
 'use server';
 
-import { db } from '@/db';
+import { db } from '../db/index';
 import { contactMessages } from '@/db/schema';
 import { desc, eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
