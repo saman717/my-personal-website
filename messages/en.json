@@ -321,5 +321,95 @@
       "empty_message": "All tasks are scheduled for today",
       "footer_hint": "Floating tasks are tasks without a fixed time, but should be completed today."
     }
+  },
+  "AboutPage": {
+    "SkillsDeep": {
+      "label": "EXPERTISE",
+      "titleNormal": "What I ",
+      "titleHighlight": "Can Do",
+      "categories": {
+        "frontend": "Frontend",
+        "backend": "Backend & SEO"
+      }
+    },
+    "AboutCTA": {
+      "titleNormal": "Ready to ",
+      "titleHighlight": "Collaborate",
+      "titleEnd": "",
+      "desc": "If you're looking for a developer who understands both code and strategy, let's talk.",
+      "btnPrimary": "View Projects",
+      "btnSecondary": "Send a Message"
+    },
+    "AboutHero": {
+      "name": "Saman Khoshnood",
+      "title": "Full-Stack Developer & SEO Specialist — Building web products with React, Next.js, and smart content strategy"
+    },
+    "ExperienceTimeline": {
+      "label": "MY JOURNEY",
+      "titleNormal": "Experience & ",
+      "titleHighlight": "Achievements",
+      "items": [
+        {
+          "title": "Freelancer — Web Dev & SEO",
+          "date": "2023 — Present",
+          "desc": "Building real-world projects with Next.js + Prisma + Tailwind. Technical SEO and content architecture for B2B clients.",
+          "color": "purple"
+        },
+        {
+          "title": "Professional Learning & Side Projects",
+          "date": "2021 — 2023",
+          "desc": "Educational platform similar to Sabzlearn, Auth system with Refresh Tokens, PLC and automation.",
+          "color": "indigo"
+        }
+      ]
+    },
+    "MyStory": {
+      "label": "WHO AM I",
+      "titleNormal": "From Curiosity to ",
+      "titleHighlight": "Real Code",
+      "p1": "I'm Saman Khoshnood, a full-stack web developer whose journey started with a curiosity about 'how websites work behind the scenes'. Now, mastering React and Next.js, I build applications that offer strong UX and rank well on search engines.",
+      "p2": "My difference is that I don't just 'write code' — I understand the core problem, choose the right architecture, and deliver a product that actually works."
+    },
+    "StatsRow": {
+      "items": [
+        {
+          "num": "+15",
+          "label": "Successful Projects"
+        },
+        {
+          "num": "3",
+          "label": "Years Experience"
+        },
+        {
+          "num": "100%",
+          "label": "Client Satisfaction"
+        }
+      ]
+    },
+    "ValuesSection": {
+      "label": "MY APPROACH",
+      "titleNormal": "How I ",
+      "titleHighlight": "Work",
+      "items": [
+        {
+          "icon": "🎯",
+          "title": "Goal-Oriented",
+          "desc": "Before writing any code, I understand the core business problem. Solutions must deliver results.",
+          "color": "purple"
+        },
+        {
+          "icon": "⚡",
+          "title": "Performance First",
+          "desc": "Clean code, excellent Core Web Vitals, and technical SEO done right from day one.",
+          "color": "emerald"
+        },
+        {
+          "icon": "🤝",
+          "title": "Full Transparency",
+          "desc": "Real progress, honest time estimates, zero fluff.",
+          "color": "blue"
+        }
+      ]
+    }
   }
 }
