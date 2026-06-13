@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "../db/index";
-import { tasks, taskLogs } from "@/db/schema";
+import { tasks, taskLogs, taskTemplates } from "@/db/schema";
 // 🌟 این خط را پیدا کن و inArray را به آن اضافه کن
 import { or, and, eq, lte, ne, inArray, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -337,5 +337,50 @@ export async function updateTaskAction(
   } catch (error) {
     console.error("Error in updateTaskAction:", error);
     return { success: false, error: "خطا در اعمال تغییرات" };
+  }
+}
+
+/**
+ * ۸. دریافت تمام قالب‌های آماده وظایف
+ */
+export async function getTaskTemplatesAction(): Promise<ActionResponse> {
+  try {
+    const allTemplates = await db
+      .select()
+      .from(taskTemplates)
+      .orderBy(desc(taskTemplates.createdAt));
+    return { success: true, data: allTemplates };
+  } catch (error) {
+    console.error("Error fetching templates:", error);
+    return { success: false, data: [] };
+  }
+}
+
+/**
+ * ۹. ذخیره یک ترکیب به عنوان قالب آماده جدید
+ */
+export async function createTaskTemplateAction(
+  title: string,
+  duration: number,
+  description: string | null,
+  priority: TaskPriority,
+  category: string,
+  energyLevel: TaskPriority,
+  isBlocking: boolean
+): Promise<ActionResponse> {
+  try {
+    await db.insert(taskTemplates).values({
+      title: title.trim(),
+      duration: duration,
+      description: description?.trim() || null,
+      priority,
+      category,
+      energyLevel,
+      isBlocking,
+    });
+    return { success: true, message: "قالب با موفقیت ذخیره شد." };
+  } catch (error) {
+    console.error("Error creating template:", error);
+    return { success: false, error: "خطا در ذخیره قالب آماده" };
   }
 }

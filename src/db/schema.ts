@@ -127,3 +127,25 @@ export const taskLogs = pgTable("task_logs", {
   isAchieved: boolean("is_achieved").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+// 📚 جدول قالب‌های آماده وظایف (Task Templates)
+export const taskTemplates = pgTable('task_templates', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  title: text('title').notNull(),
+  description: text('description'),
+  duration: integer('duration').default(60).notNull(),
+
+  // اولویت اقدام
+  priority: text('priority', { enum: ['low', 'medium', 'high'] }).default('medium').notNull(),
+
+  // دسته‌بندی موضوعی (work, personal, learning, ...)
+  category: text('category').default('work').notNull(),
+
+  // سطح انرژی مورد نیاز
+  energyLevel: text('energy_level', { enum: ['low', 'medium', 'high'] }).default('medium').notNull(),
+
+  // مسدودکننده بودن تقویم
+  isBlocking: boolean('is_blocking').default(false).notNull(),
+
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
