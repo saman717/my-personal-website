@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { Task } from "@/types/task";
-import { useTranslate } from "@/hooks/useTranslate"; // 🌟 ایمپورت هوک ترجمه یکپارچه پروژه‌ات
+import { useTranslate } from "@/hooks/useTranslate";
 
 const priorityStyles: Record<string, string> = {
   low: "border-blue-500/30 bg-blue-500/5 text-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.1)]",
@@ -17,7 +17,7 @@ interface TaskCardProps {
 }
 
 export default function TaskCard({ task, onEdit, onToggleGoal, variant }: TaskCardProps) {
-  const { t } = useTranslate(); // 🌟 استخراج متد تیک زدن ترجمه کلاینت
+  const { t } = useTranslate(); 
 
   const wrapperClass = variant === "timeline"
     ? "flex-1 min-w-[240px] p-4 rounded-xl border flex flex-col gap-3 transition-all hover:scale-[1.01] cursor-pointer"
@@ -31,21 +31,22 @@ export default function TaskCard({ task, onEdit, onToggleGoal, variant }: TaskCa
           {task.title}
         </h4>
         <span className="shrink-0 text-[9px] bg-white/10 px-1.5 py-0.5 rounded text-gray-300">
-          ⏱️ {t("admintask.TaskCard.minutes").replace("{count}", String(task.duration))}
+          ⏱️ {t("adminTask.TaskCard.minutes").replace("{count}", String(task.duration))}
         </span>
       </div>
 
       {/* تگ‌های وضعیت: دسته‌بندی، سطح انرژی و مسدودکننده */}
       <div className="flex flex-wrap items-center gap-1.5">
         <span className="text-[8px] font-medium px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-gray-400">
-          {t(`admintask.TaskCard.categories.${task.category}`)}
+          {t(`adminTask.TaskCard.categories.${task.category}`)}
         </span>
 
-        <span className={`text-[8px] font-medium px-1.5 py-0.5 rounded border ${task.energyLevel === "high" ? "bg-red-500/10 border-red-500/20 text-red-400" :
+        <span className={`text-[8px] font-medium px-1.5 py-0.5 rounded border ${
+            task.energyLevel === "high" ? "bg-red-500/10 border-red-500/20 text-red-400" :
             task.energyLevel === "medium" ? "bg-amber-500/10 border-amber-500/20 text-amber-400" :
-              "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+            "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
           }`}>
-          {t("Tadmintask.askCard.energy.prefix")} {t(`admintask.TaskCard.energy.${task.energyLevel}`)}
+          {t("adminTask.TaskCard.energy.prefix")} {t(`adminTask.TaskCard.energy.${task.energyLevel}`)}
         </span>
 
         {task.isBlocking && (
@@ -73,7 +74,7 @@ export default function TaskCard({ task, onEdit, onToggleGoal, variant }: TaskCa
             </svg>
           </div>
           <span className={`text-[10px] font-bold select-none transition-colors ${task.isAttempted ? "text-blue-400" : "text-gray-500 group-hover:text-gray-300"}`}>
-            {t("admintask.TaskCard.done_label")}
+            {t("adminTask.TaskCard.done_label")}
           </span>
         </label>
 
@@ -86,7 +87,7 @@ export default function TaskCard({ task, onEdit, onToggleGoal, variant }: TaskCa
             </svg>
           </div>
           <span className={`text-[10px] font-bold select-none transition-colors ${task.isAchieved ? "text-emerald-400" : "text-gray-500 group-hover:text-gray-300"}`}>
-            {t("admintask.TaskCard.achieved_label")}
+            {t("adminTask.TaskCard.achieved_label")}
           </span>
         </label>
       </div>

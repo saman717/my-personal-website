@@ -24,7 +24,7 @@ export default function FloatingBoard({ floatingTasks, onOpenModal, onToggleGoal
       </h3>
 
       {/* لیست تسک‌ها */}
-      <div className="flex-1 overflow-y-auto pr-1 admin-neon-scrollbar space-y-4">
+      <div className="flex-1 overflow-y-auto p-2 admin-neon-scrollbar space-y-4">
         {floatingTasks.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-gray-600 space-y-2 opacity-50">
             <span className="text-2xl">{emptyState.icon}</span>
