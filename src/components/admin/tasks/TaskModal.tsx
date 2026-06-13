@@ -4,7 +4,7 @@ import React from "react";
 import { MASTER_TIME_SLOTS } from "@/lib/calendar.config";
 import { useTaskForm } from "@/hooks/useTaskForm";
 import { Task } from "@/types/task";
-import { useTranslate } from "@/hooks/useTranslate"; // 🌟 ایمپورت هوک ترجمه خودت
+import { useTranslate } from "@/hooks/useTranslate";
 
 interface TaskModalProps {
   isOpen: boolean;
@@ -17,13 +17,21 @@ interface TaskModalProps {
 }
 
 export default function TaskModal(props: TaskModalProps) {
-  const { t, locale } = useTranslate(); // 🌟 خواندن مستقیم از کلاینت
-  
+  const { t, locale } = useTranslate();
+
   const {
     title, setTitle, description, setDescription, priority, setPriority,
     timeSlot, setTimeSlot, isBlocking, setIsBlocking, duration, setDuration,
     recurrence, setRecurrence, category, setCategory, energyLevel, setEnergyLevel,
-    editScope, setEditScope, isSubmitting, isEditMode, maxAllowedDuration, handleSubmit, handleDelete
+    editScope, setEditScope, isSubmitting, isEditMode, handleSubmit, handleDelete,
+
+    // 🌟 این متغیر جا مانده بود و باعث خطای تایپ‌اسکریپت می‌شد:
+    maxAllowedDuration,
+
+    selectedTemplateId, setSelectedTemplateId,
+    saveAsTemplate, setSaveAsTemplate,
+    templates = [], // 🌟 مقدار پیش‌فرض امن برای جلوگیری از خطای undefined در متد map
+    handleTemplateSelect
   } = useTaskForm(props);
 
   if (!props.isOpen) return null;
@@ -33,6 +41,8 @@ export default function TaskModal(props: TaskModalProps) {
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onClick={props.onClose} />
 
       <div className="relative bg-[#0d0d12] border border-white/10 rounded-2xl w-full max-w-2xl max-h-[95vh] flex flex-col shadow-[0_0_40px_rgba(0,0,0,0.5)] overflow-hidden animate-fadeIn">
+
+        {/* Header */}
         <div className="shrink-0 flex items-center justify-between p-4 md:p-5 border-b border-white/5 bg-white/[0.02]">
           <h3 className="text-white font-bold flex items-center gap-2 text-sm md:text-base">
             <span className={`w-2 h-2 rounded-full shadow-[0_0_10px] ${isEditMode ? "bg-amber-500 shadow-amber-500" : "bg-emerald-500 shadow-emerald-500"}`} />
@@ -43,7 +53,27 @@ export default function TaskModal(props: TaskModalProps) {
 
         <form id="task-form" onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
           <div className="flex-1 overflow-y-auto p-4 md:p-5 space-y-5 admin-neon-scrollbar">
-            
+
+            {/* بخش انتخاب از قالب‌های آماده (فقط در حالت Create) */}
+            {!isEditMode && templates.length > 0 && (
+              <div className="flex flex-col gap-1.5 p-3 rounded-xl border border-purple-500/20 bg-purple-500/5 mb-2">
+                <label className="text-[10px] text-purple-400 uppercase font-bold tracking-wider">📚 انتخاب از قالب‌های آماده</label>
+                <select
+                  value={selectedTemplateId || ""}
+                  onChange={(e) => {
+                    setSelectedTemplateId(e.target.value);
+                    if (e.target.value) handleTemplateSelect(e.target.value);
+                  }}
+                  className="bg-[#07070a] border border-purple-500/30 text-xs text-purple-200 rounded-xl px-3 h-10 focus:outline-none focus:border-purple-500/50 w-full transition-all"
+                >
+                  <option value="">-- تسک اختصاصی و جدید --</option>
+                  {templates.map(tmpl => (
+                    <option key={tmpl.id} value={tmpl.id}>{tmpl.title} ({tmpl.duration} دقیقه)</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <div className="flex flex-col gap-1.5">
               <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">{t("adminTask.TaskModal.task_title_label")}</label>
               <input type="text" required placeholder={t("adminTask.TaskModal.task_title_placeholder")} value={title} onChange={(e) => setTitle(e.target.value)} className="bg-[#07070a] border border-white/5 rounded-xl px-4 h-11 text-xs text-white focus:outline-none focus:border-emerald-500/50 transition-all w-full" />
@@ -52,7 +82,7 @@ export default function TaskModal(props: TaskModalProps) {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">{t("adminTask.TaskModal.time_slot_label")}</label>
-                <select value={timeSlot} onChange={(e) => setTimeSlot(e.target.value)} className="bg-[#07070a] border border-white/5 text-xs text-gray-300 rounded-xl px-3 h-11 focus:outline-none w-full">
+                <select value={timeSlot || "floating"} onChange={(e) => setTimeSlot(e.target.value === "floating" ? null : e.target.value)} className="bg-[#07070a] border border-white/5 text-xs text-gray-300 rounded-xl px-3 h-11 focus:outline-none w-full">
                   <option value="floating">{t("adminTask.TaskModal.floating_slot")}</option>
                   {MASTER_TIME_SLOTS.map((slot) => {
                     const availableMinutes = 60 - (props.slotCapacities?.[slot] || 0);
@@ -73,7 +103,16 @@ export default function TaskModal(props: TaskModalProps) {
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">{t("adminTask.TaskModal.duration_label")}</label>
-                <input type="number" min="5" max={maxAllowedDuration} step="5" value={duration} onChange={(e) => setDuration(Math.min(Number(e.target.value), maxAllowedDuration))} className="bg-[#07070a] border border-white/5 text-xs text-emerald-400 font-bold rounded-xl px-3 h-11 text-center focus:outline-none w-full" />
+                {/* 🌟 اینپوت هوشمند بر اساس maxAllowedDuration */}
+                <input
+                  type="number"
+                  min="5"
+                  max={maxAllowedDuration}
+                  step="5"
+                  value={duration}
+                  onChange={(e) => setDuration(Math.min(Number(e.target.value), maxAllowedDuration))}
+                  className="bg-[#07070a] border border-white/5 text-xs text-emerald-400 font-bold rounded-xl px-3 h-11 text-center focus:outline-none w-full"
+                />
               </div>
             </div>
 
@@ -123,7 +162,29 @@ export default function TaskModal(props: TaskModalProps) {
                 <div className={`absolute top-0.5 ${locale === "en" ? "left-0.5" : "right-0.5"} w-4 h-4 bg-white rounded-full transition-transform duration-300 ${isBlocking ? (locale === "en" ? "translate-x-5" : "-translate-x-5") : "translate-x-0"}`} />
               </div>
             </div>
-            
+
+            {/* ذخیره به‌عنوان قالب جدید (با گارد غیرفعال‌سازی) */}
+            {!isEditMode && (
+              <label className={`flex items-center gap-3 p-3 rounded-xl border border-white/5 transition-colors ${selectedTemplateId ? "opacity-50 cursor-not-allowed bg-black/20" : "cursor-pointer hover:bg-white/5"}`}>
+                <div className={`relative flex items-center justify-center w-5 h-5 rounded border transition-all ${saveAsTemplate && !selectedTemplateId ? "bg-emerald-500 border-emerald-500" : "bg-[#07070a] border-white/20"}`}>
+                  <input
+                    type="checkbox"
+                    disabled={!!selectedTemplateId}
+                    checked={saveAsTemplate}
+                    onChange={(e) => setSaveAsTemplate(e.target.checked)}
+                    className="sr-only"
+                  />
+                  <svg className={`w-3.5 h-3.5 text-black transition-all duration-200 ${saveAsTemplate && !selectedTemplateId ? "opacity-100 scale-100" : "opacity-0 scale-50"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-emerald-400 block select-none">💾 ذخیره ترکیب فعلی به عنوان قالب جدید</span>
+                  <span className="text-[9px] text-gray-500 block">برای استفاده سریع در روزهای آینده</span>
+                </div>
+              </label>
+            )}
+
             {isEditMode && props.taskToEdit?.recurrence !== "none" && (
               <div className="p-3 sm:p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 w-full">
                 <h4 className="text-xs font-bold text-amber-400 mb-3">⚠️ دامنه تغییرات وظیفه تکرارشونده</h4>
