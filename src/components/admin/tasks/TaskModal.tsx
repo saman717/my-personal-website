@@ -25,12 +25,11 @@ export default function TaskModal(props: TaskModalProps) {
     recurrence, setRecurrence, category, setCategory, energyLevel, setEnergyLevel,
     editScope, setEditScope, isSubmitting, isEditMode, handleSubmit, handleDelete,
 
-    // 🌟 این متغیر جا مانده بود و باعث خطای تایپ‌اسکریپت می‌شد:
-    maxAllowedDuration,
+    maxAllowedDuration, 
 
     selectedTemplateId, setSelectedTemplateId,
     saveAsTemplate, setSaveAsTemplate,
-    templates = [], // 🌟 مقدار پیش‌فرض امن برای جلوگیری از خطای undefined در متد map
+    templates = [], 
     handleTemplateSelect
   } = useTaskForm(props);
 
@@ -82,7 +81,12 @@ export default function TaskModal(props: TaskModalProps) {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">{t("adminTask.TaskModal.time_slot_label")}</label>
-                <select value={timeSlot || "floating"} onChange={(e) => setTimeSlot(e.target.value === "floating" ? null : e.target.value)} className="bg-[#07070a] border border-white/5 text-xs text-gray-300 rounded-xl px-3 h-11 focus:outline-none w-full">
+                {/* 🌟 هماهنگی کامل با استیت کامپوننت و حذف مقدار null */}
+                <select 
+                  value={timeSlot || "floating"} 
+                  onChange={(e) => setTimeSlot(e.target.value)} 
+                  className="bg-[#07070a] border border-white/5 text-xs text-gray-300 rounded-xl px-3 h-11 focus:outline-none w-full"
+                >
                   <option value="floating">{t("adminTask.TaskModal.floating_slot")}</option>
                   {MASTER_TIME_SLOTS.map((slot) => {
                     const availableMinutes = 60 - (props.slotCapacities?.[slot] || 0);
@@ -103,7 +107,6 @@ export default function TaskModal(props: TaskModalProps) {
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">{t("adminTask.TaskModal.duration_label")}</label>
-                {/* 🌟 اینپوت هوشمند بر اساس maxAllowedDuration */}
                 <input
                   type="number"
                   min="5"
