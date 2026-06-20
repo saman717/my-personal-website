@@ -411,5 +411,34 @@
         }
       ]
     }
+  },
+  "services": {
+    "hero": {
+      "title": "Beyond Coding; Engineering Scalable Systems.",
+      "subtitle": "I help businesses and industries transform their complex challenges into sustainable, profitable solutions through modern software architecture, AI, and systems thinking."
+    },
+    "core": {
+      "s1_title": "Web Application Architecture",
+      "s1_desc": "Designing and implementing fast, secure, and responsive web systems. From complex administrative dashboards to custom reservation platforms with modern cloud infrastructure.",
+      "s2_title": "AI & Industrial Machine Vision",
+      "s2_desc": "Integrating intelligent algorithms and image processing for quality control, laboratory equipment data extraction, and industrial automation to minimize human error.",
+      "s3_title": "Enterprise Redesign & SEO",
+      "s3_desc": "Modernizing corporate and B2B platforms with structural data architecture and product categorization. Transforming legacy websites into high-ranking digital assets.",
+      "s4_title": "Resource Management Systems",
+      "s4_desc": "Building custom applications and databases to eliminate paperwork, integrate scattered information, and maintain precise control over inventory, sales, and organizational workflows."
+    },
+    "partner": {
+      "badge": "PREMIUM SERVICE",
+      "title": "Bridging Industry and Technology; Consulting & Networking",
+      "desc": "Digital transformation doesn't happen merely by writing code; it requires a profound understanding of industrial processes and a robust network of experts. As your technical accelerator and consultant, I analyze production line requirements and leverage my connections within the tech ecosystem to lead top-tier teams for large-scale enterprise projects.",
+      "f1": "Requirements analysis driven by systems thinking",
+      "f2": "Connecting specialized software teams to industrial projects",
+      "f3": "High-level architectural oversight and resource optimization"
+    },
+    "cta": {
+      "title": "Ready to engineer your next system?",
+      "subtitle": "Schedule a consultation session to evaluate your business challenges and map out the optimal technical roadmap.",
+      "button": "Book a Session in My Custom System"
+    }
   }
 }
