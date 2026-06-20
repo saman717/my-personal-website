@@ -440,5 +440,23 @@
       "subtitle": "Schedule a consultation session to evaluate your business challenges and map out the optimal technical roadmap.",
       "button": "Book a Session in My Custom System"
     }
+  },
+  "contact": {
+    "hero": {
+      "title": "Communication Bridges; Let's Talk.",
+      "subtitle": "For industrial collaborations, technical acceleration, or consulting on intelligent systems, reach out through the methods below."
+    },
+    "methods": {
+      "email_label": "Direct Email",
+      "phone_label": "Phone Number",
+      "location_label": "Location",
+      "location_val": "Iran, Mashhad",
+      "social_label": "Professional Networks"
+    },
+    "booking_cta": {
+      "title": "Need a deep dive into your project?",
+      "subtitle": "If you are looking for a dedicated technical consulting session, use my custom booking system directly.",
+      "button": "Book a Session in My Custom System"
+    }
   }
 }
