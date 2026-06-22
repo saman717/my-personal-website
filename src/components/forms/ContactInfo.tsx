@@ -5,7 +5,7 @@ import React, { useState } from "react";
 
 
 interface ContactInfoLabels {
-    heading: string;
+    heading ?: string;
     description: string;
     emailLabel: string;
     phoneLabel: string;
@@ -19,7 +19,7 @@ interface ContactInfoProps {
     socialCount?: number;
     labels: ContactInfoLabels;
     isRTL: boolean;
-    locale:string
+    locale: string
 }
 
 export const ContactInfo: React.FC<ContactInfoProps> = ({
