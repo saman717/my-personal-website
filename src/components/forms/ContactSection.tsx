@@ -17,11 +17,12 @@ export default async function ContactSection({ locale }: ContactSectionProps) {
     phone: "0935867279",
   };
 
+  // 🌟 اصلاح شد: مپ کردن دقیق به ساختار JSON جدید همراه با Optional Chaining
   const infoLabels = {
-    heading: contactDict.info.heading,
-    description: contactDict.info.description,
-    emailLabel: contactDict.form.email,
-    phoneLabel: contactDict.form.phone,
+    heading: contactDict?.hero?.title || "", 
+    description: contactDict?.hero?.subtitle || "",
+    emailLabel: contactDict?.methods?.email_label || "Email",
+    phoneLabel: contactDict?.methods?.phone_label || "Phone",
     copied: isRTL ? "کپی شد!" : "Copied!",
     scheduleMeeting: isRTL ? "تعیین وقت ملاقات" : "Schedule Meeting"
   };
@@ -40,9 +41,6 @@ export default async function ContactSection({ locale }: ContactSectionProps) {
         dir={isRTL ? "rtl" : "ltr"}
       >
 
-        {/* بخش اطلاعات (Contact Info)
-            در RTL: سمت راست تصویر قرار می‌گیرد (و متمایل به خط وسط)
-            در LTR: سمت چپ تصویر قرار می‌گیرد (و متمایل به خط وسط) */}
         <div className="flex justify-center w-full order-1 md:order-1 md:justify-end">
           <ContactInfo
             email={contactData.email}
@@ -54,14 +52,11 @@ export default async function ContactSection({ locale }: ContactSectionProps) {
           />
         </div>
 
-        {/* خط جداکننده میانی (همیشه وسط) */}
         <div className="hidden md:block h-full min-h-[400px] w-px bg-gradient-to-b from-transparent via-white/15 to-transparent self-stretch order-2" />
 
-        {/* بخش فرم (Contact Form)
-            در RTL: سمت چپ تصویر قرار می‌گیرد (و متمایل به خط وسط)
-            در LTR: سمت راست تصویر قرار می‌گیرد (و متمایل به خط وسط) */}
         <div className="flex justify-center w-full order-3 md:order-3 md:justify-start">
-          <ContactForm  labels={contactDict.form} isRTL={isRTL} />
+          {/* 🌟 اصلاح شد: فرم هم با یک شیء خالی محافظت شد تا کرش نکند */}
+          <ContactForm labels={contactDict?.form || {}} isRTL={isRTL} />
         </div>
 
       </div>
