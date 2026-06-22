@@ -457,6 +457,19 @@
       "title": "Need a deep dive into your project?",
       "subtitle": "If you are looking for a dedicated technical consulting session, use my custom booking system directly.",
       "button": "Book a Session in My Custom System"
+    },
+    "form": {
+      "placeholders": {
+        "fullName": "Full Name",
+        "email": "Email Address",
+        "message": "Your Message..."
+      },
+      "errors": {
+        "fullName": "Full name is required",
+        "email": "Valid email is required"
+      },
+      "submit": "Send Message",
+      "sending": "Sending..."
     }
   }
 }
