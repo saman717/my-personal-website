@@ -458,5 +458,13 @@
       "subtitle": "If you are looking for a dedicated technical consulting session, use my custom booking system directly.",
       "button": "Book a Session in My Custom System"
     }
-  }
+  },
+  "booking": {
+      "title": "Book a Consultation",
+      "localTime": "Your Local Time:",
+      "detecting": "Detecting...",
+      "autoDetected": "(Auto-Detected)",
+      "successMessage": "Your booking request has been submitted successfully and is awaiting admin approval.",
+      "errorMessage": "An error occurred. Please try again."
+    }
 }
