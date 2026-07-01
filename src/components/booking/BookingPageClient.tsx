@@ -8,7 +8,7 @@ import { submitBookingRequestAction } from "@/actions/booking";
 
 interface BookingPageClientProps {
     locale: string;
-    labels: any; 
+    labels: any;
 }
 
 export default function BookingPageClient({ locale, labels }: BookingPageClientProps) {
@@ -32,7 +32,7 @@ export default function BookingPageClient({ locale, labels }: BookingPageClientP
     const handleBookingSubmit = async (finalData: any) => {
         if (!selectedDate || !selectedTime) return;
         setApiMessage(null);
-        
+
         const year = selectedDate.getFullYear();
         const month = String(selectedDate.getMonth() + 1).padStart(2, "0");
         const day = String(selectedDate.getDate()).padStart(2, "0");
@@ -50,14 +50,14 @@ export default function BookingPageClient({ locale, labels }: BookingPageClientP
         if (response.success) {
             setApiMessage({
                 type: "success",
-                text: labels.successMessage 
+                text: labels.successMessage
             });
             setSelectedDate(null);
             setSelectedTime(null);
         } else {
             setApiMessage({
                 type: "error",
-                text: response.error || labels.errorMessage 
+                text: response.error || labels.errorMessage
             });
         }
     };
@@ -65,7 +65,7 @@ export default function BookingPageClient({ locale, labels }: BookingPageClientP
     return (
         <div dir={isRTL ? "rtl" : "ltr"} className="min-h-screen bg-[#07070a] py-10 px-4 md:px-8">
             <div className="max-w-6xl mx-auto flex flex-col gap-8">
-                
+
                 <div className="flex flex-col gap-2 text-center md:text-start">
                     <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
                         {labels.title}
@@ -79,11 +79,10 @@ export default function BookingPageClient({ locale, labels }: BookingPageClientP
                 </div>
 
                 {apiMessage && (
-                    <div className={`p-4 rounded-xl text-sm font-medium border animate-fadeIn max-w-6xl w-full ${
-                        apiMessage.type === "success" 
-                            ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" 
+                    <div className={`p-4 rounded-xl text-sm font-medium border animate-fadeIn max-w-6xl w-full ${apiMessage.type === "success"
+                            ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
                             : "bg-red-500/10 border-red-500/20 text-red-400"
-                    }`}>
+                        }`}>
                         {apiMessage.text}
                     </div>
                 )}
@@ -94,6 +93,7 @@ export default function BookingPageClient({ locale, labels }: BookingPageClientP
                             locale={locale}
                             selectedDate={selectedDate}
                             onDateChange={handleDateChange}
+                            labels={labels?.booking}
                         />
                         {selectedDate && (
                             <BookingTimeSlots
@@ -101,6 +101,7 @@ export default function BookingPageClient({ locale, labels }: BookingPageClientP
                                 selectedDate={selectedDate}
                                 selectedTime={selectedTime}
                                 onTimeSelect={setSelectedTime}
+                                labels={labels?.booking}
                             />
                         )}
                     </div>
@@ -110,6 +111,7 @@ export default function BookingPageClient({ locale, labels }: BookingPageClientP
                             selectedDate={selectedDate}
                             selectedTime={selectedTime}
                             onSubmitSuccess={handleBookingSubmit}
+                            labels={labels}
                         />
                     </div>
                 </div>

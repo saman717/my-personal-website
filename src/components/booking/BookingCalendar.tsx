@@ -1,24 +1,22 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useTranslate } from "@/hooks/useTranslate";
+import React, { useState, useEffect, useMemo } from "react";
 import { getMonthAvailabilityAction } from "@/actions/booking";
 
 interface BookingCalendarProps {
   locale: string;
   selectedDate: Date | null;
   onDateChange: (date: Date) => void;
+  labels?: any; 
 }
 
-export default function BookingCalendar({ locale, selectedDate, onDateChange }: BookingCalendarProps) {
-  const { t } = useTranslate();
+export default function BookingCalendar({ locale, selectedDate, onDateChange, labels }: BookingCalendarProps) {
   const isRTL = locale === "fa";
-  const currentLocale = isRTL ? "fa-IR" : "en-US";
+  const calLabels = labels?.calendar || {};
 
-  // 🗓️ استیت ماه جاری (پایه اصلی محاسبات ادمین)
   const [currentMonth, setCurrentMonth] = useState<Date>(() => {
     const d = new Date();
-    d.setHours(12, 0, 0, 0); // گارد امنیتی تایم‌زون
+    d.setHours(12, 0, 0, 0); 
     return d;
   });
 
@@ -26,17 +24,60 @@ export default function BookingCalendar({ locale, selectedDate, onDateChange }: 
   const [fullDays, setFullDays] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // 📞 دریافت آنی وضعیت شلوغی ماه از بک‌اِند (دقیقاً مثل ادمین)
+  // 🧠 موتور هوشمندِ تقویم دوگانه (کاملاً نیتیو و بدون پکیج سنگین)
+  const { firstDay, lastDay, totalDays, startDayOfWeek, monthTitle } = useMemo(() => {
+    const localeStr = isRTL ? "fa-IR" : "en-US";
+    const getMonthYear = (d: Date) => new Intl.DateTimeFormat(localeStr, { year: "numeric", month: "numeric" }).format(d);
+    
+    const targetMonthYear = getMonthYear(currentMonth);
+
+    // ۱. پیدا کردن دقیقِ روز اولِ این ماه (شمسی یا میلادی)
+    let first = new Date(currentMonth);
+    while (true) {
+      const prev = new Date(first);
+      prev.setDate(prev.getDate() - 1);
+      if (getMonthYear(prev) !== targetMonthYear) break;
+      first = prev;
+    }
+
+    // ۲. پیدا کردن دقیقِ روز آخرِ این ماه
+    let last = new Date(currentMonth);
+    while (true) {
+      const next = new Date(last);
+      next.setDate(next.getDate() + 1);
+      if (getMonthYear(next) !== targetMonthYear) break;
+      last = next;
+    }
+
+    const total = Math.round((last.getTime() - first.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    const title = new Intl.DateTimeFormat(localeStr, { year: "numeric", month: "long" }).format(currentMonth);
+
+    return { firstDay: first, lastDay: last, totalDays: total, startDayOfWeek: first.getDay(), monthTitle: title };
+  }, [currentMonth, isRTL]);
+
+  // 📞 دریافت هوشمند اطلاعات از بک‌اِند (ترکیب دو ماه میلادی برای پوشش کامل یک ماه شمسی)
   useEffect(() => {
     const fetchAvailability = async () => {
       setIsLoading(true);
       try {
-        const year = currentMonth.getFullYear();
-        const monthForBackend = currentMonth.getMonth() + 1;
-        const res = await getMonthAvailabilityAction(year, monthForBackend);
+        const m1 = firstDay.getMonth() + 1;
+        const y1 = firstDay.getFullYear();
+        const m2 = lastDay.getMonth() + 1;
+        const y2 = lastDay.getFullYear();
 
-        setBlockedDays(res.blockedDays || []);
-        setFullDays(res.fullDays || []);
+        const res1 = await getMonthAvailabilityAction(y1, m1);
+        let blocked = res1.blockedDays || [];
+        let full = res1.fullDays || [];
+
+        // اگر ماه شمسی ما بین دو ماه میلادی مشترک بود، هر دو را فچ کرده و ترکیب می‌کنیم
+        if (m1 !== m2 || y1 !== y2) {
+          const res2 = await getMonthAvailabilityAction(y2, m2);
+          blocked = [...blocked, ...(res2.blockedDays || [])];
+          full = [...full, ...(res2.fullDays || [])];
+        }
+
+        setBlockedDays([...new Set(blocked)]);
+        setFullDays([...new Set(full)]);
       } catch (error) {
         console.error("Error fetching availability:", error);
       } finally {
@@ -45,49 +86,34 @@ export default function BookingCalendar({ locale, selectedDate, onDateChange }: 
     };
 
     fetchAvailability();
-  }, [currentMonth]);
+  }, [firstDay.getTime(), lastDay.getTime()]);
 
-  // 🧮 تولید هوشمند ۷ روزِ ردیف‌های تقویم متناسب با ماه جاری
-  const year = currentMonth.getFullYear();
-  const monthIndex = currentMonth.getMonth();
-
-  // تعداد روزهای ماه جاری
-  const totalDaysInMonth = new Date(year, monthIndex + 1, 0).getDate();
-
-  // پیدا کردن روزِ شروعِ ماه برای تراز کردن گرید
-  const firstDayInstance = new Date(year, monthIndex, 1);
-  const startDayOfWeek = firstDayInstance.getDay(); // 0 (یکشنبه) تا 6 (شنبه)
-
-  // تولید پویای آرایه روزها
-  const daysArray = Array.from({ length: totalDaysInMonth }).map((_, i) => {
-    const d = new Date(year, monthIndex, i + 1);
-    d.setHours(12, 0, 0, 0); // ثبات کامل ساعت برای جلوگیری از پرش تاریخ
+  // 🧮 تولید آرایه دقیق روزها از ۱ تا ۳۱
+  const daysArray = Array.from({ length: totalDays }).map((_, i) => {
+    const d = new Date(firstDay);
+    d.setDate(firstDay.getDate() + i);
+    d.setHours(12, 0, 0, 0);
     return d;
   });
 
-  // ناوبری ساده و روان ماه‌ها
   const handlePrevMonth = () => {
-    setCurrentMonth(new Date(year, monthIndex - 1, 1, 12, 0, 0));
+    const prev = new Date(firstDay);
+    prev.setDate(prev.getDate() - 1);
+    setCurrentMonth(prev);
   };
 
   const handleNextMonth = () => {
-    setCurrentMonth(new Date(year, monthIndex + 1, 1, 12, 0, 0));
+    const next = new Date(lastDay);
+    next.setDate(next.getDate() + 1);
+    setCurrentMonth(next);
   };
-
-  // فرمت داینامیک عنوان ماه با Intl (همان جادوی ادمین)
-  const monthTitle = new Intl.DateTimeFormat(isRTL ? "fa-IR-u-ca-persian" : "en-US", {
-    year: "numeric",
-    month: "long",
-  }).format(currentMonth);
 
   const daysOfWeek = isRTL
     ? ["ش", "ی", "د", "س", "چ", "پ", "ج"]
     : ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
-  // گارد تراز کلاینت: تبدیل روزِ شروعِ میلادی به خانه‌های خالیِ هماهنگ با شنبه در ایران
-  const emptySlotsCount = isRTL
-    ? (startDayOfWeek === 6 ? 0 : startDayOfWeek + 1)
-    : startDayOfWeek;
+  // 📐 تراز کردن روز اول هفته متناسب با زبان (ایران=شنبه ، انگلیسی=یکشنبه)
+  const emptySlotsCount = isRTL ? (startDayOfWeek + 1) % 7 : startDayOfWeek;
 
   const isSameDay = (d1: Date | null, d2: Date) => {
     if (!d1) return false;
@@ -131,16 +157,15 @@ export default function BookingCalendar({ locale, selectedDate, onDateChange }: 
       {/* گرید روزها */}
       <div className={`grid grid-cols-7 gap-2 ${isLoading ? "opacity-30 pointer-events-none" : ""} transition-opacity`}>
 
-        {/* رندر خانه‌های خالی اول ماه */}
+        {/* خانه‌های خالی برای تراز کردن روز اول ماه */}
         {Array.from({ length: emptySlotsCount }).map((_, idx) => (
           <div key={`empty-${idx}`} className="aspect-square opacity-0 pointer-events-none" />
         ))}
 
-        {/* رندر روزهای واقعی */}
         {daysArray.map((dateObj, index) => {
           const isSelected = isSameDay(selectedDate, dateObj);
 
-          // فرمت دیتابیسی تاریخ YYYY-MM-DD
+          // فرمت دیتابیس برای مطابقت با روزهای پر شده
           const y = dateObj.getFullYear();
           const m = String(dateObj.getMonth() + 1).padStart(2, "0");
           const d = String(dateObj.getDate()).padStart(2, "0");
@@ -155,8 +180,8 @@ export default function BookingCalendar({ locale, selectedDate, onDateChange }: 
 
           const isAvailable = !isBlocked && !isFull && !isPast;
 
-          // شماره روز نمایشی (اگر فارسی است به شمسی و اگر انگلیسی است به میلادی تبدیل می‌شود)
-          const displayDayNumber = new Intl.DateTimeFormat(currentLocale, { day: "numeric" }).format(dateObj);
+          // 🌟 عدد روز حالا همیشه درست (۱ تا ۳۱) رندر می‌شود
+          const displayDayNumber = new Intl.DateTimeFormat(isRTL ? "fa-IR" : "en-US", { day: "numeric" }).format(dateObj);
 
           return (
             <div

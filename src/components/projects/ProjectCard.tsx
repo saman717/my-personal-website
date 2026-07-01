@@ -1,8 +1,5 @@
-"use client";
-
 import Link from "next/link";
 import ProjectTag from "./ProjectTag";
-import { useTranslate } from "@/hooks/useTranslate";
 
 interface ProjectCardProps {
   title: string;
@@ -10,6 +7,7 @@ interface ProjectCardProps {
   tags: string[];
   imagePlaceholder?: string;
   projectLink?: string;
+  viewProjectLabel: string; // 🌟 پراپ جدید برای دریافت متن دکمه
 }
 
 export default function ProjectCard({ 
@@ -18,9 +16,8 @@ export default function ProjectCard({
   tags, 
   imagePlaceholder,
   projectLink = "#",
+  viewProjectLabel,
 }: ProjectCardProps) {
-  const { t } = useTranslate();
-
   return (
     <div className="group bg-[#1E1E24] rounded-2xl p-3 border border-white/5 hover:border-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/30">
       {/* تصویر - کوچیک‌تر */}
@@ -50,7 +47,7 @@ export default function ProjectCard({
         href={projectLink}
         className="block w-full bg-[#E0E0E0] text-[#1E1E24] text-center py-2 rounded-lg text-sm font-medium hover:bg-white transition-all duration-300"
       >
-        {t("projects.view_project")}
+        {viewProjectLabel} {/* 🌟 استفاده از پراپ به جای هوک */}
       </Link>
     </div>
   );

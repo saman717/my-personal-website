@@ -2,7 +2,6 @@
 
 import React, { useMemo } from "react";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
-import { useTranslate } from "@/hooks/useTranslate";
 
 // دیتای تستی خام (بدون وابستگی به زبان)
 const rawData = [
@@ -15,16 +14,21 @@ const rawData = [
   { dayKey: "Sun", views: 190, messages: 28 },
 ];
 
-export default function AnalyticsChart() {
-  const { t } = useTranslate();
+// 🌟 تعریف Interface برای دریافت دیکشنری
+interface AnalyticsChartProps {
+  labels: any; 
+}
 
-  // 🌍 ترجمه داینامیک نام روزها برای محور X نمودار
+export default function AnalyticsChart({ labels }: AnalyticsChartProps) {
+  
+  // 🌍 ترجمه داینامیک نام روزها با استفاده از آبجکت labels
   const localizedData = useMemo(() => {
     return rawData.map(item => ({
       ...item,
-      dayName: t(`admin.dashboard.chart.days.${item.dayKey}`)
+      // خواندن نام روز از داخل آبجکت days بر اساس کلید
+      dayName: labels.days[item.dayKey] || item.dayKey
     }));
-  }, [t]);
+  }, [labels]);
 
   // کامپوننت اختصاصی Tooltip با پشتیبانی از دوزبانه
   const CustomTooltip = ({ active, payload }: any) => {
@@ -32,8 +36,8 @@ export default function AnalyticsChart() {
       return (
         <div className="bg-[#0d0d12]/90 border border-white/10 backdrop-blur-xl p-3 rounded-xl shadow-[0_10px_25px_rgba(0,0,0,0.5)] font-mono text-xs flex flex-col gap-1.5" dir="ltr">
           <p className="text-gray-400 font-bold mb-0.5">{payload[0].payload.dayName}</p>
-          <p className="text-emerald-400">{t("admin.dashboard.chart.views")}: <span className="font-bold text-white">{payload[0].value}</span></p>
-          <p className="text-blue-400">{t("admin.dashboard.chart.messages")}: <span className="font-bold text-white">{payload[1].value}</span></p>
+          <p className="text-emerald-400">{labels.views}: <span className="font-bold text-white">{payload[0].value}</span></p>
+          <p className="text-blue-400">{labels.messages}: <span className="font-bold text-white">{payload[1].value}</span></p>
         </div>
       );
     }
@@ -46,15 +50,15 @@ export default function AnalyticsChart() {
       {/* هدر بالایی نمودار */}
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-0.5">
-          <h4 className="text-sm font-bold text-white tracking-tight">{t("admin.dashboard.chart.title")}</h4>
-          <p className="text-[10px] text-gray-500">{t("admin.dashboard.chart.subtitle")}</p>
+          <h4 className="text-sm font-bold text-white tracking-tight">{labels.title}</h4>
+          <p className="text-[10px] text-gray-500">{labels.subtitle}</p>
         </div>
         <div className="flex items-center gap-3 text-[10px] font-mono">
           <div className="flex items-center gap-1.5 text-gray-400">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" /> {t("admin.dashboard.chart.views")}
+            <span className="w-2 h-2 rounded-full bg-emerald-500" /> {labels.views}
           </div>
           <div className="flex items-center gap-1.5 text-gray-400">
-            <span className="w-2 h-2 rounded-full bg-blue-500" /> {t("admin.dashboard.chart.messages")}
+            <span className="w-2 h-2 rounded-full bg-blue-500" /> {labels.messages}
           </div>
         </div>
       </div>

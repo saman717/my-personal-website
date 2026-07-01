@@ -1,4 +1,5 @@
 "use client";
+
 import React from "react";
 import { Task } from "@/types/task";
 import TaskCard from "./TaskCard";
@@ -7,12 +8,13 @@ import { useFloatingBoard } from "@/hooks/useFloatingBoard";
 interface FloatingBoardProps {
   floatingTasks: Task[];
   onOpenModal: (slot: string | null, task?: Task | null) => void;
+  labels: any; // ✅ دریافت ساختار لیبل‌ها از والد
   onToggleGoal: (taskId: string, attempted: boolean, achieved: boolean, field: "attempt" | "achieve") => void;
 }
 
-export default function FloatingBoard({ floatingTasks, onOpenModal, onToggleGoal }: FloatingBoardProps) {
-  // جدا کردن منطق نمایش و ترجمه از ظاهر
-  const { title, emptyState, footerHint } = useFloatingBoard(floatingTasks);
+export default function FloatingBoard({ floatingTasks, onOpenModal, onToggleGoal, labels }: FloatingBoardProps) {
+  // جدا کردن منطق نمایش و ترجمه از ظاهر — 🌟 پراپ labels حالا کاملاً در دسترس است
+  const { title, emptyState, footerHint } = useFloatingBoard(floatingTasks, labels?.FloatingBoard);
 
   return (
     <div className="lg:col-span-1 bg-[#0d0d12]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-5 md:p-6 flex flex-col h-[600px] lg:h-auto lg:sticky lg:top-6">
@@ -38,6 +40,7 @@ export default function FloatingBoard({ floatingTasks, onOpenModal, onToggleGoal
               onEdit={onOpenModal}
               onToggleGoal={onToggleGoal}
               variant="floating"
+              labels={labels?.TaskCard}
             />
           ))
         )}

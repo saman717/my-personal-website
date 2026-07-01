@@ -222,6 +222,21 @@
           "close": "Close Preview"
         }
       }
+    },
+    "stats": {
+      "messages": {
+        "title": "Messages",
+        "loading": "Fetching data...",
+        "newRequests": "new requests this week"
+      },
+      "tasks": {
+        "title": "Tasks",
+        "subtext": "8 tasks for today"
+      },
+      "jobHunt": {
+        "title": "Job Applications",
+        "subtext": "3 pending interviews"
+      }
     }
   },
   "adminBooking": {
@@ -457,14 +472,48 @@
       "title": "Need a deep dive into your project?",
       "subtitle": "If you are looking for a dedicated technical consulting session, use my custom booking system directly.",
       "button": "Book a Session in My Custom System"
+    },
+    "form": {
+      "placeholders": {
+        "fullName": "Full Name",
+        "email": "Email Address",
+        "message": "Your Message..."
+      },
+      "errors": {
+        "fullName": "Full name is required",
+        "email": "Valid email is required"
+      },
+      "submit": "Send Message",
+      "sending": "Sending..."
     }
   },
   "booking": {
-      "title": "Book a Consultation",
-      "localTime": "Your Local Time:",
-      "detecting": "Detecting...",
-      "autoDetected": "(Auto-Detected)",
-      "successMessage": "Your booking request has been submitted successfully and is awaiting admin approval.",
-      "errorMessage": "An error occurred. Please try again."
-    }
+    "title": "Book a Consultation",
+    "localTime": "Your Local Time:",
+    "detecting": "Detecting...",
+    "autoDetected": "(Auto-Detected)",
+    "successMessage": "Your booking request has been submitted successfully and is awaiting admin approval.",
+    "errorMessage": "An error occurred. Please try again.",
+    "meetingType": "Meeting Type",
+    "online": "Online (Google Meet)",
+    "inPerson": "In-Person",
+    "name": "Full Name",
+    "email": "Email Address",
+    "projectDesc": "Project Description",
+    "summary": "Booking Summary",
+    "summaryDate": "Date:",
+    "summaryTime": "Time:",
+    "summaryType": "Type:",
+    "noDateTime": "Please select a date and time from the calendar first.",
+    "submitBtn": "Submit Booking Request",
+    "namePlaceholder": "Enter your full name",
+    "nameRequired": "Name is required",
+    "nameMinLength": "Name must be at least 3 characters",
+    "emailPlaceholder": "example@gmail.com",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Invalid email format",
+    "descPlaceholder": "Briefly describe your project or needs...",
+    "descRequired": "Description is required",
+    "descMinLength": "Description must be at least 10 characters"
+  }
 }

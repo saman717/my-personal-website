@@ -19,6 +19,13 @@ interface SkillCardProps {
   iconKey?: string;
   skills: SkillItem[];
   delay?: number;
+  // 🌟 پراپ‌های جدید برای اتصال به معماری i18n
+  isRTL: boolean;
+  progressLabels: {
+    learning: string;
+    proficient: string;
+    expert: string;
+  };
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -28,7 +35,15 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   other: OtherIcon,
 };
 
-export default function SkillCard({ title, iconKey, skills, delay = 0 }: SkillCardProps) {
+export default function SkillCard({ 
+  title, 
+  iconKey, 
+  skills, 
+  delay = 0,
+  isRTL,
+  progressLabels 
+}: SkillCardProps) {
+  
   const IconComponent = iconKey ? iconMap[iconKey] : null;
   const [isHovered, setIsHovered] = useState(false);
 
@@ -58,7 +73,6 @@ export default function SkillCard({ title, iconKey, skills, delay = 0 }: SkillCa
       {/* ⭐ ستاره طلایی - فقط کارت Expert */}
       {isAllPerfect && (
         <div className="absolute top-3 right-3 z-20 flex items-center justify-center">
-          {/* درخشش پشت ستاره با انیمیشن pulse */}
           <div className="absolute w-10 h-10 rounded-full bg-[#ffcc00]/20 animate-ping" />
           <div className="absolute w-8 h-8 rounded-full bg-[#ffcc00]/30 animate-pulse" />
           <StarIcon className="w-6 h-6 relative z-10 drop-shadow-[0_0_8px_rgba(255,204,0,0.8)]" />
@@ -108,6 +122,9 @@ export default function SkillCard({ title, iconKey, skills, delay = 0 }: SkillCa
               percentage={skill.percentage}
               label={skill.name}
               forceGold={isAllPerfect}
+              // 🌟 پاس دادن اطلاعات به پروگرس‌بار
+              isRTL={isRTL}
+              labels={progressLabels}
             />
           ))}
         </div>

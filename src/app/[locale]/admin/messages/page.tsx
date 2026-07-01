@@ -1,11 +1,15 @@
 import React from "react";
+import { getDictionary } from "@/lib/translate";
 import MessagesManager from "@/components/admin/messages/MessagesManager";
 
-export default function AdminMessagesPage() {
+export default async function AdminMessagesPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const dict = await getDictionary(locale);
+
   return (
-    <div className="flex flex-col w-full gap-5 pb-10" dir="rtl">
-      {/* لود کردن مستقیم منیجر شیشه‌ای با قابلیت‌های تماماً کلاینت */}
-      <MessagesManager />
-    </div>
+    <MessagesManager
+      locale={locale}
+      labels={dict.admin.dashboard.messagesPage}
+    />
   );
 }
