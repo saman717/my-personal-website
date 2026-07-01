@@ -1,13 +1,19 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useTranslate } from "@/hooks/useTranslate";
 
+// تعریف دقیق پراپ‌هایی که از پدر (SkillCard) می‌آیند
 interface ProgressBarProps {
   percentage: number;
-  label: string;
+  label: string; // نام مهارت (مثلاً React)
   color?: string;
   forceGold?: boolean;
+  isRTL: boolean;
+  labels: {
+    learning: string;
+    proficient: string;
+    expert: string;
+  };
 }
 
 function getProgressColor(percentage: number, forceGold?: boolean): string {
@@ -17,20 +23,22 @@ function getProgressColor(percentage: number, forceGold?: boolean): string {
   return "rgba(57, 255, 20, 0.6)";
 }
 
-// تابع کمکی برای شبیه‌سازی دقیق انیمیشن ease-out مرورگر در جاوااسکریپت
 const easeOutQuad = (t: number) => t * (2 - t);
 
-export default function ProgressBar({ percentage, label, color, forceGold }: ProgressBarProps) {
-  const { t, locale } = useTranslate();
-  const isRTL = locale === "fa";
+export default function ProgressBar({ 
+  percentage, 
+  label, 
+  color, 
+  forceGold, 
+  isRTL, 
+  labels 
+}: ProgressBarProps) {
   
   const containerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [currentPercentage, setCurrentPercentage] = useState(0);
 
   const progressColor = color || getProgressColor(percentage, forceGold);
-
-  // تغییر زمان انیمیشن از یک جا (مثلا ۳۰۰۰ میلی‌ثانیه یعنی ۳ ثانیه)
   const ANIMATION_DURATION = 3000;
 
   useEffect(() => {
@@ -60,7 +68,6 @@ export default function ProgressBar({ percentage, label, color, forceGold }: Pro
         if (!startTimestamp) startTimestamp = timestamp;
         const timeProgress = Math.min((timestamp - startTimestamp) / ANIMATION_DURATION, 1);
         
-        // اعمال Ease-Out روی زمان تا عدد و نوار دقیقاً با هم کند و تند شوند
         const easedProgress = easeOutQuad(timeProgress);
         setCurrentPercentage(Math.floor(easedProgress * percentage));
 
@@ -73,15 +80,13 @@ export default function ProgressBar({ percentage, label, color, forceGold }: Pro
     }
   }, [isVisible, percentage]);
 
-  let progressLabelKey: string;
-  if (percentage <= 33) progressLabelKey = "skills.progress_level.learning";
-  else if (percentage <= 66) progressLabelKey = "skills.progress_level.proficient";
-  else progressLabelKey = "skills.progress_level.expert";
+  // تعیین متن سطح مهارت مستقیماً از روی پراپِ ترجمه شده
+  let progressLabel: string;
+  if (percentage <= 33) progressLabel = labels.learning;
+  else if (percentage <= 66) progressLabel = labels.proficient;
+  else progressLabel = labels.expert;
 
-  const progressLabel = t(progressLabelKey);
   const textAlign = isRTL ? "text-right" : "text-left";
-  
-  // برگردانده شده به حالت اولیه طبق درخواست شما
   const barOrigin = isRTL ? { left: 0 } : { right: 0 };
 
   const progressBarElement = (
@@ -91,7 +96,7 @@ export default function ProgressBar({ percentage, label, color, forceGold }: Pro
         style={{
           width: `${isVisible ? percentage : 0}%`,
           backgroundColor: progressColor,
-          transitionDuration: `${ANIMATION_DURATION}ms`, // تنظیم داینامیک زمان نوار هماهنگ با جاوااسکریپت
+          transitionDuration: `${ANIMATION_DURATION}ms`,
           ...barOrigin,
         }}
       />

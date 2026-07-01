@@ -1,48 +1,18 @@
 "use client";
 
 import Image from "next/image";
-
-import { usePathname, useRouter } from "next/navigation";
-
 import { TimeDisplay } from "@/hooks/useTimeHeader";
-
-import { useTranslate } from "@/hooks/useTranslate";
-
 import LanguageSwitcher from "@/components/layout/Header/LanguageSwitcher";
 
-
-export default function Header({
-  locale,
-  onMenuToggle,
-}: {
+// 🌟 اضافه شدن labels به Interface
+interface HeaderProps {
   locale: string;
   onMenuToggle: () => void;
-}) {
-  const { t } =
-    useTranslate();
+  labels: any; 
+}
 
-  const pathname =
-    usePathname();
-
-  const router = useRouter();
-
-  const handleLanguageChange = (
-    newLocale: string
-  ) => {
-    if (newLocale === locale) {
-      return;
-    }
-
-    const segments =
-      pathname.split("/");
-
-    segments[1] = newLocale;
-
-    const newPath =
-      segments.join("/");
-
-    router.push(newPath);
-  };
+export default function Header({ locale, onMenuToggle, labels }: HeaderProps) {
+  // دیگر نیازی به useRouter، usePathname و توابع اضافی در این فایل نیست
 
   return (
     <header className="relative h-20 bg-[#0d0d12]/30 border-b border-white/5 backdrop-blur-xl px-4 md:px-10 flex items-center justify-between z-30 flex-shrink-0">
@@ -72,7 +42,8 @@ export default function Header({
         </button>
 
         {/* Language Switcher */}
-        <LanguageSwitcher/>
+        {/* نکته: اگر LanguageSwitcher هم نیاز به ترجمه دارد، باید بررسی شود */}
+        <LanguageSwitcher />
       </div>
 
       {/* Right Section */}
@@ -85,9 +56,8 @@ export default function Header({
           </span>
 
           <h2 className="text-sm font-bold text-white">
-            {t("admin.welcome")}
+            {labels.welcome} {/* 🌟 خواندن مستقیم از Prop */}
           </h2>
-
 
           <div className="text-[10px] text-gray-400">
             <TimeDisplay locale={locale} />

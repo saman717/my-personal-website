@@ -11,9 +11,9 @@ export default async function HomePage({ params }: { params: { locale: string } 
   return (
     <>
       <HeroSection locale={locale} />
-      <SkillsSection />
-      <ProjectsSection />
-      <TimelineSection />
+      <SkillsSection locale={locale} />
+      <ProjectsSection locale={locale} />
+      <TimelineSection locale={locale} />
       <ContactSection locale={locale} />
     </>
   );
