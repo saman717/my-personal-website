@@ -1,8 +1,6 @@
-import Footer from '@/components/layout/footer/Footer';
-import Header from '@/components/layout/Header/Header';
-import { ToastProvider } from '@/context/ToastContext';
+import { PersonJsonLd } from '@/components/seo/JsonLd';
 
-export default async function LocaleLayout({
+export default async function PublicLayout({
   children,
   params,
 }: {
@@ -10,15 +8,10 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const isRTL = locale === 'fa';
-
   return (
-    <div dir={isRTL ? 'rtl' : 'ltr'} lang={locale} className="flex flex-col min-h-screen">
-      <Header locale={locale} />
-      <ToastProvider>
-        <main className="flex-1">{children}</main>
-      </ToastProvider>
-      <Footer locale={locale} />
-    </div>
+    <>
+      <PersonJsonLd locale={locale} />
+      {children}
+    </>
   );
 }
