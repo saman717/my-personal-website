@@ -43,7 +43,7 @@ async function getProject(slug: string, locale: string) {
     .where(
       and(
         eq(portfolioProjectTranslations.projectId, project.id),
-        eq(portfolioProjectTranslations.locale, locale)
+        eq(portfolioProjectTranslations.locale, locale as 'fa' | 'en')
       )
     )
     .limit(1);
@@ -56,7 +56,7 @@ async function getProject(slug: string, locale: string) {
     .where(
       and(
         eq(portfolioProjectContent.projectId, project.id),
-        eq(portfolioProjectContent.locale, locale)
+        eq(portfolioProjectContent.locale, locale as 'fa' | 'en')
       )
     )
     .limit(1);
