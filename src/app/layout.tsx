@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   openGraph: {
     images: [
       {
-        url: '/images/og-image.jpg',
+        url: '/images/og-image.png',
         width: 1200,
         height: 630,
         alt: 'Saman Khoshnood - Frontend Developer',
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    images: ['/images/og-image.jpg'],
+    images: ['/images/og-image.png'],
   },
   icons: {
     icon: [
