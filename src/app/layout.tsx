@@ -5,12 +5,36 @@ import { Vazirmatn } from 'next/font/google';
 const vazirmatn = Vazirmatn({
   subsets: ['arabic'],
   variable: '--font-vazirmatn',
-  display: 'optional', // از 'swap' به 'optional'
-  weight: ['400', '500', '600', '700'], // فقط وزن‌هایی که واقعاً استفاده می‌کنی
+  display: 'optional',
+  weight: ['400', '500', '600', '700'],
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://samankhoshnoud.ir';
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://samankhoshnoud.ir'),
+  metadataBase: new URL(SITE_URL),
+  alternates: {
+    canonical: SITE_URL,
+    languages: {
+      'fa-IR': `${SITE_URL}/fa`,
+      'en-US': `${SITE_URL}/en`,
+      'x-default': `${SITE_URL}/fa`,
+    },
+  },
+  openGraph: {
+    images: [
+      {
+        url: '/images/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Saman Khoshnood - Frontend Developer',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: ['/images/og-image.jpg'],
+  },
   icons: {
     icon: [
       { url: '/icons/MSKH(32).webp', sizes: '32x32', type: 'image/webp' },
