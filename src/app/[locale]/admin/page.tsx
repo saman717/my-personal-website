@@ -1,4 +1,3 @@
-import './globals.css';
 import type { Metadata } from 'next';
 import { Vazirmatn } from 'next/font/google';
 
