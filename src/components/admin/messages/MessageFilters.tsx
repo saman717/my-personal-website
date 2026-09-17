@@ -1,18 +1,25 @@
-// components/admin/messages/MessageFilters.tsx
+"use client";
+
 import React from "react";
 import { IconSearch } from "./icons";
-import { useTranslate } from "@/hooks/useTranslate";
 
 interface MessageFiltersProps {
   search: string;
   setSearch: (val: string) => void;
   filter: "all" | "unread" | "read";
   setFilter: (val: "all" | "unread" | "read") => void;
+  labels: any; // 🌟 اضافه کردن لیبل‌ها
 }
 
-export default function MessageFilters({ search, setSearch, filter, setFilter }: MessageFiltersProps) {
-  const { t } = useTranslate();
-
+export default function 
+  ({ 
+  search, 
+  setSearch, 
+  filter, 
+  setFilter, 
+  labels 
+}: MessageFiltersProps) {
+  
   return (
     <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-[#13131a]/30 border border-white/[0.03] p-4 rounded-2xl backdrop-blur-md">
       <div className="relative flex-1 max-w-md">
@@ -23,7 +30,7 @@ export default function MessageFilters({ search, setSearch, filter, setFilter }:
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder={t("admin.dashboard.messagesPage.searchPlaceholder")}
+          placeholder={labels.searchPlaceholder}
           className="w-full pl-4 pr-11 py-2.5 bg-black/20 border border-white/5 rounded-xl text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500/40 transition-all font-sans"
         />
       </div>
@@ -39,7 +46,7 @@ export default function MessageFilters({ search, setSearch, filter, setFilter }:
                 : "text-gray-400 hover:text-white"
             }`}
           >
-            {t(`admin.dashboard.messagesPage.filters.${tab}`)}
+            {labels[tab]} {/* 🌟 خواندن مستقیم از لیبل‌ها */}
           </button>
         ))}
       </div>
