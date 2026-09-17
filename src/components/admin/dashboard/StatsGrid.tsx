@@ -3,10 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import StatCard from "./StatCard";
-import { useTranslate } from "@/hooks/useTranslate";
-// import { Mail, CheckSquare, PlaneTakeoff } from "lucide-react";
-
 import { getMessagesStats } from "@/actions/messages";
+// import { Mail, CheckSquare, PlaneTakeoff } from "lucide-react";
 
 interface MessageStats {
   totalMessages: number;
@@ -15,16 +13,18 @@ interface MessageStats {
   weekMessages: number;
 }
 
-export default function StatsGrid() {
-  const { t } = useTranslate();
+// 🌟 اضافه شدن اینترفیس برای دریافت دیکشنری
+interface StatsGridProps {
+  labels: any; 
+}
 
-  const [messageStats, setMessageStats] =
-    useState<MessageStats>({
-      totalMessages: 0,
-      unreadMessages: 0,
-      todayMessages: 0,
-      weekMessages: 0,
-    });
+export default function StatsGrid({ labels }: StatsGridProps) {
+  const [messageStats, setMessageStats] = useState<MessageStats>({
+    totalMessages: 0,
+    unreadMessages: 0,
+    todayMessages: 0,
+    weekMessages: 0,
+  });
 
   const [loading, setLoading] = useState(true);
 
@@ -59,7 +59,7 @@ export default function StatsGrid() {
     >
       {/* پیام‌ها */}
       <StatCard
-        title={t("admin.dashboard.stats.messages.title")}
+        title={labels.messages.title}
         value={
           loading
             ? "..."
@@ -67,8 +67,8 @@ export default function StatsGrid() {
         }
         subtext={
           loading
-            ? "درحال دریافت اطلاعات..."
-            : `${messageStats.weekMessages} درخواست جدید در این هفته`
+            ? labels.messages.loading
+            : `${messageStats.weekMessages} ${labels.messages.newRequests}`
         }
         variant={
           messageStats.unreadMessages > 0
@@ -80,24 +80,18 @@ export default function StatsGrid() {
 
       {/* تسک‌ها */}
       <StatCard
-        title={t("admin.dashboard.stats.tasks.title")}
+        title={labels.tasks.title}
         value="8"
-        subtext={t(
-          "admin.dashboard.stats.tasks.subtext"
-        )}
+        subtext={labels.tasks.subtext}
         variant="blue"
         // icon={<CheckSquare className="w-4 h-4" />}
       />
 
       {/* جاب‌ها */}
       <StatCard
-        title={t(
-          "admin.dashboard.stats.jobHunt.title"
-        )}
+        title={labels.jobHunt.title}
         value="3"
-        subtext={t(
-          "admin.dashboard.stats.jobHunt.subtext"
-        )}
+        subtext={labels.jobHunt.subtext}
         variant="purple"
         // icon={<PlaneTakeoff className="w-4 h-4" />}
       />

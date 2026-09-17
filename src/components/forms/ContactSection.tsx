@@ -1,4 +1,3 @@
-import React from "react";
 import { getDictionary } from '@/lib/translate';
 import { ContactForm } from "./ContactForm";
 import { ContactInfo } from "./ContactInfo";
@@ -27,11 +26,12 @@ export default async function ContactSection({ locale }: ContactSectionProps) {
     scheduleMeeting: isRTL ? "تعیین وقت ملاقات" : "Schedule Meeting"
   };
 
+  const newLocal = "absolute top-1/4 left-1/4 w-87.5 h-87.5 bg-purple-600/10 rounded-full blur-[130px] pointer-events-none";
   return (
-    <section className="w-full min-h-[600px] md:min-h-[700px] bg-[#111113] flex items-center justify-center p-6 md:px-16 md:py-12 relative overflow-hidden">
+    <section className="w-full min-h-150 md:min-h-175 bg-[#111113] flex items-center justify-center p-6 md:px-16 md:py-12 relative overflow-hidden">
       
       {/* پس‌زمینه‌های نوری */}
-      <div className="absolute top-1/4 left-1/4 w-[350px] h-[350px] bg-purple-600/10 rounded-full blur-[130px] pointer-events-none" />
+      <div className={newLocal} />
       <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-emerald-600/5 rounded-full blur-[150px] pointer-events-none" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-900/6 rounded-full blur-[180px] pointer-events-none" />
 

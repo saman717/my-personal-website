@@ -3,25 +3,28 @@
 import React, { useEffect } from "react";
 import NavLink from "./NavLink";
 import Link from "next/link";
-import { useTranslate } from "@/hooks/useTranslate";
 import { useUnreadCount } from "@/hooks/useUnreadCount";
-import { usePathname } from "next/navigation"; // 🌟 اضافه شد برای تشخیص تغییر صفحه
+import { usePathname } from "next/navigation";
 
-// 🌟 پراپ onClose اضافه شد تا لی‌آوت اصلی بتونه سایدبار رو ببنده
-export default function Sidebar({ locale, onClose }: { locale: string; onClose?: () => void }) {
-    const { t } = useTranslate();
+// 🌟 اضافه شدن labels به Interface
+interface SidebarProps {
+  locale: string;
+  onClose?: () => void;
+  labels: any; 
+}
+
+export default function Sidebar({ locale, onClose, labels }: SidebarProps) {
     const isRTL = locale === 'fa';
     const { data: unreadCount = 0 } = useUnreadCount();
     
-    // گرفتن مسیر فعلی
     const pathname = usePathname();
 
-    // 🚀 Best Practice: هر زمان که URL تغییر کرد (کاربر روی لینکی کلیک کرد)، سایدبار موبایل بسته شود
+    // بسته شدن سایدبار موبایل هنگام تغییر مسیر
     useEffect(() => {
         if (onClose) {
             onClose();
         }
-    }, [pathname]);
+    }, [pathname, onClose]);
 
     return (
         <aside
@@ -34,8 +37,8 @@ export default function Sidebar({ locale, onClose }: { locale: string; onClose?:
                     <div className="w-3.5 h-3.5 rounded-full bg-emerald-500 shadow-[0_0_15px_#10b981] animate-pulse" />
                 </div>
                 <div className="flex flex-col">
-                    <span className="font-bold text-white tracking-wide text-sm">{t("admin.console")}</span>
-                    <span className="text-[10px] text-gray-500">{t("admin.status")}</span>
+                    <span className="font-bold text-white tracking-wide text-sm">{labels.console}</span>
+                    <span className="text-[10px] text-gray-500">{labels.status}</span>
                 </div>
             </div>
 
@@ -49,33 +52,33 @@ export default function Sidebar({ locale, onClose }: { locale: string; onClose?:
                     {/* دسته اول: مدیریت سایت */}
                     <div className="flex flex-col gap-1">
                         <span className={`px-2 md:px-5 text-[9px] md:text-[10px] text-gray-600 uppercase tracking-wider mb-2 block ${isRTL ? 'text-right' : 'text-left'}`}>
-                            {t("admin.categories.site")}
+                            {labels.categories.site}
                         </span>
-                        <NavLink href={`/${locale}/admin`}>{t("admin.menu.dashboard")}</NavLink>
+                        <NavLink href={`/${locale}/admin`}>{labels.menu.dashboard}</NavLink>
                         <NavLink
                             href={`/${locale}/admin/messages`}
                             badge={unreadCount > 0 ? `+${unreadCount}` : undefined}
                             badgeStyle={isRTL ? "left-3 md:left-4" : "right-3 md:right-4"}
                         >
-                            {t("admin.menu.messages")}
+                            {labels.menu.messages}
                         </NavLink>
-                        <NavLink href={`/${locale}/admin/blog`}>{t("admin.menu.blog")}</NavLink>
-                        <NavLink href={`/${locale}/admin/portfolio`}>{t("admin.menu.portfolio")}</NavLink>
-                        <NavLink href={`/${locale}/admin/media`}>{t("admin.menu.media")}</NavLink>
-                        <NavLink href={`/${locale}/admin/settings`}>{t("admin.menu.settings")}</NavLink>
+                        <NavLink href={`/${locale}/admin/blog`}>{labels.menu.blog}</NavLink>
+                        <NavLink href={`/${locale}/admin/portfolio`}>{labels.menu.portfolio}</NavLink>
+                        <NavLink href={`/${locale}/admin/media`}>{labels.menu.media}</NavLink>
+                        <NavLink href={`/${locale}/admin/settings`}>{labels.menu.settings}</NavLink>
                     </div>
 
                     {/* دسته دوم: سیستم عامل زندگی */}
                     <div className="flex flex-col gap-1">
                         <span className={`px-2 md:px-5 text-[9px] md:text-[10px] text-gray-600 uppercase tracking-wider mb-2 block ${isRTL ? 'text-right' : 'text-left'}`}>
-                            {t("admin.categories.personal")}
+                            {labels.categories.personal}
                         </span>
-                        <NavLink href={`/${locale}/admin/tasks`}>{t("admin.menu.tasks")}</NavLink>
-                        <NavLink href={`/${locale}/admin/bookings`}>{t("admin.menu.Booking")}</NavLink>
-                        <NavLink href={`/${locale}/admin/job-hunt`}>{t("admin.menu.jobHunt")}</NavLink>
-                        <NavLink href={`/${locale}/admin/growth`}>{t("admin.menu.growth")}</NavLink>
-                        <NavLink href={`/${locale}/admin/bots`}>{t("admin.menu.bots")}</NavLink>
-                        <NavLink href={`/${locale}/admin/automation`}>{t("admin.menu.automation")}</NavLink>
+                        <NavLink href={`/${locale}/admin/tasks`}>{labels.menu.tasks}</NavLink>
+                        <NavLink href={`/${locale}/admin/bookings`}>{labels.menu.Booking}</NavLink>
+                        <NavLink href={`/${locale}/admin/job-hunt`}>{labels.menu.jobHunt}</NavLink>
+                        <NavLink href={`/${locale}/admin/growth`}>{labels.menu.growth}</NavLink>
+                        <NavLink href={`/${locale}/admin/bots`}>{labels.menu.bots}</NavLink>
+                        <NavLink href={`/${locale}/admin/automation`}>{labels.menu.automation}</NavLink>
                     </div>
 
                 </div>
@@ -85,10 +88,10 @@ export default function Sidebar({ locale, onClose }: { locale: string; onClose?:
             <div className="pt-2.5 border-t border-white/5">
                 <Link
                     href={`/${locale}`}
-                    onClick={onClose} // 🌟 اضافه کردن onClose برای اطمینان از بسته شدن سایدبار هنگام خروج
+                    onClick={onClose}
                     className="flex items-center justify-center gap-1 w-full px-4 py-3 rounded-xl text-xs font-medium text-white border border-red-500/20 bg-red-500/5 hover:border-red-500 hover:bg-red-500/10 transition-all duration-300 shadow-[0_0_15px_rgba(239,68,68,0.02)] hover:shadow-[0_0_20px_rgba(239,68,68,0.15)]"
                 >
-                    🚪 {t("admin.exit")}
+                    🚪 {labels.exit}
                 </Link>
             </div>
         </aside>

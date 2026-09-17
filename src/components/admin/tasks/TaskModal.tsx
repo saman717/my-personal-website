@@ -4,7 +4,6 @@ import React from "react";
 import { MASTER_TIME_SLOTS } from "@/lib/calendar.config";
 import { useTaskForm } from "@/hooks/useTaskForm";
 import { Task } from "@/types/task";
-import { useTranslate } from "@/hooks/useTranslate";
 
 interface TaskModalProps {
   isOpen: boolean;
@@ -14,22 +13,24 @@ interface TaskModalProps {
   initialTimeSlot: string | null;
   slotCapacities: Record<string, number>;
   taskToEdit?: Task | null;
+  locale: string;
+  labels: any; // 🌟 دریافت لیبل‌ها از والد
 }
 
 export default function TaskModal(props: TaskModalProps) {
-  const { t, locale } = useTranslate();
+  const { labels, locale } = props;
 
   const {
     title, setTitle, description, setDescription, priority, setPriority,
     timeSlot, setTimeSlot, isBlocking, setIsBlocking, duration, setDuration,
     recurrence, setRecurrence, category, setCategory, energyLevel, setEnergyLevel,
     editScope, setEditScope, isSubmitting, isEditMode, handleSubmit, handleDelete,
-    maxAllowedDuration, 
+    maxAllowedDuration,
     selectedTemplateId, setSelectedTemplateId,
     saveAsTemplate, setSaveAsTemplate,
-    templates = [], 
+    templates = [],
     handleTemplateSelect
-  } = useTaskForm(props);
+  } = useTaskForm({ ...props, labels: props.labels });
 
   if (!props.isOpen) return null;
 
@@ -43,7 +44,9 @@ export default function TaskModal(props: TaskModalProps) {
         <div className="shrink-0 flex items-center justify-between p-4 md:p-5 border-b border-white/5 bg-white/[0.02]">
           <h3 className="text-white font-bold flex items-center gap-2 text-sm md:text-base">
             <span className={`w-2 h-2 rounded-full shadow-[0_0_10px] ${isEditMode ? "bg-amber-500 shadow-amber-500" : "bg-emerald-500 shadow-emerald-500"}`} />
-            {isEditMode ? t("adminTask.TaskModal.title_edit") : t("adminTask.TaskModal.title_create").replace("{date}", props.selectedDateStr)}
+            {isEditMode
+              ? (labels?.title_edit || "ویرایش وظیفه")
+              : (labels?.title_create ? labels.title_create.replace("{date}", props.selectedDateStr) : `ایجاد وظیفه جدید برای ${props.selectedDateStr}`)}
           </h3>
           <button onClick={props.onClose} className="text-gray-500 hover:text-white text-2xl leading-none transition-colors">×</button>
         </div>
@@ -54,7 +57,9 @@ export default function TaskModal(props: TaskModalProps) {
             {/* Templates */}
             {!isEditMode && templates.length > 0 && (
               <div className="flex flex-col gap-1.5 p-3 rounded-xl border border-purple-500/20 bg-purple-500/5 mb-2">
-                <label className="text-[10px] text-purple-400 uppercase font-bold tracking-wider">📚 انتخاب از قالب‌های آماده</label>
+                <label className="text-[10px] text-purple-400 uppercase font-bold tracking-wider">
+                  {labels?.template_label || "📚 انتخاب از قالب‌های آماده"}
+                </label>
                 <select
                   value={selectedTemplateId || ""}
                   onChange={(e) => {
@@ -63,7 +68,7 @@ export default function TaskModal(props: TaskModalProps) {
                   }}
                   className="bg-[#07070a] border border-purple-500/30 text-xs text-purple-200 rounded-xl px-3 h-10 focus:outline-none focus:border-purple-500/50 w-full transition-all"
                 >
-                  <option value="">-- تسک اختصاصی و جدید --</option>
+                  <option value="">{labels?.template_default || "-- تسک اختصاصی و جدید --"}</option>
                   {templates.map(tmpl => (
                     <option key={tmpl.id} value={tmpl.id}>{tmpl.title} ({tmpl.duration} دقیقه)</option>
                   ))}
@@ -72,20 +77,23 @@ export default function TaskModal(props: TaskModalProps) {
             )}
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">{t("adminTask.TaskModal.task_title_label")}</label>
-              <input type="text" required placeholder={t("adminTask.TaskModal.task_title_placeholder")} value={title} onChange={(e) => setTitle(e.target.value)} className="bg-[#07070a] border border-white/5 rounded-xl px-4 h-11 text-xs text-white focus:outline-none focus:border-emerald-500/50 transition-all w-full" />
+              <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
+                {labels?.task_title_label || "عنوان وظیفه"}
+              </label>
+              <input type="text" required placeholder={labels?.task_title_placeholder || "عنوان..."} value={title} onChange={(e) => setTitle(e.target.value)} className="bg-[#07070a] border border-white/5 rounded-xl px-4 h-11 text-xs text-white focus:outline-none focus:border-emerald-500/50 transition-all w-full" />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">{t("adminTask.TaskModal.time_slot_label")}</label>
-                {/* 🌟 بخش اصلی که فیکس شد تا null نفرستد */}
-                <select 
-                  value={timeSlot || "floating"} 
-                  onChange={(e) => setTimeSlot(e.target.value)} 
+                <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
+                  {labels?.time_slot_label || "بازه زمانی"}
+                </label>
+                <select
+                  value={timeSlot || "floating"}
+                  onChange={(e) => setTimeSlot(e.target.value)}
                   className="bg-[#07070a] border border-white/5 text-xs text-gray-300 rounded-xl px-3 h-11 focus:outline-none w-full"
                 >
-                  <option value="floating">{t("adminTask.TaskModal.floating_slot")}</option>
+                  <option value="floating">{labels?.floating_slot || "وظیفه شناور"}</option>
                   {MASTER_TIME_SLOTS.map((slot) => {
                     const availableMinutes = 60 - (props.slotCapacities?.[slot] || 0);
                     const isCurrentSlot = isEditMode && props.taskToEdit?.timeSlot === slot;
@@ -95,16 +103,20 @@ export default function TaskModal(props: TaskModalProps) {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">{t("adminTask.TaskModal.priority_label")}</label>
+                <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
+                  {labels?.priority_label || "اولویت"}
+                </label>
                 <select value={priority} onChange={(e) => setPriority(e.target.value as any)} className="bg-[#07070a] border border-white/5 text-xs text-gray-300 rounded-xl px-3 h-11 focus:outline-none w-full">
-                  <option value="low">{t("adminTask.TaskModal.priority_low")}</option>
-                  <option value="medium">{t("adminTask.TaskModal.priority_medium")}</option>
-                  <option value="high">{t("adminTask.TaskModal.priority_high")}</option>
+                  <option value="low">{labels?.priority_low || "پایین"}</option>
+                  <option value="medium">{labels?.priority_medium || "متوسط"}</option>
+                  <option value="high">{labels?.priority_high || "بالا"}</option>
                 </select>
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">{t("adminTask.TaskModal.duration_label")}</label>
+                <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
+                  {labels?.duration_label || "مدت زمان (دقیقه)"}
+                </label>
                 <input
                   type="number"
                   min="5"
@@ -119,45 +131,53 @@ export default function TaskModal(props: TaskModalProps) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pt-4 border-t border-white/5">
               <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">{t("adminTask.TaskModal.recurrence_label")}</label>
+                <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
+                  {labels?.recurrence_label || "تکرار وظیفه"}
+                </label>
                 <select value={recurrence} onChange={(e) => setRecurrence(e.target.value as any)} className="bg-[#07070a] border border-white/5 text-xs text-gray-300 rounded-xl px-3 h-11 focus:outline-none w-full">
-                  <option value="none">{t("adminTask.TaskModal.recurrence_none")}</option>
-                  <option value="daily">{t("adminTask.TaskModal.recurrence_daily")}</option>
-                  <option value="weekly">{t("adminTask.TaskModal.recurrence_weekly")}</option>
-                  <option value="monthly">{t("adminTask.TaskModal.recurrence_monthly")}</option>
+                  <option value="none">{labels?.recurrence_none || "بدون تکرار"}</option>
+                  <option value="daily">{labels?.recurrence_daily || "روزانه"}</option>
+                  <option value="weekly">{labels?.recurrence_weekly || "هفتگی"}</option>
+                  <option value="monthly">{labels?.recurrence_monthly || "ماهانه"}</option>
                 </select>
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">{t("adminTask.TaskModal.category_label")}</label>
+                <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
+                  {labels?.category_label || "دسته بندی"}
+                </label>
                 <select value={category} onChange={(e) => setCategory(e.target.value)} className="bg-[#07070a] border border-white/5 text-xs text-gray-300 rounded-xl px-3 h-11 focus:outline-none w-full">
-                  <option value="work">{t("adminTask.TaskModal.category_work")}</option>
-                  <option value="personal">{t("adminTask.TaskModal.category_personal")}</option>
-                  <option value="learning">{t("adminTask.TaskModal.category_learning")}</option>
-                  <option value="health">{t("adminTask.TaskModal.category_health")}</option>
-                  <option value="free">{t("adminTask.TaskModal.category_free")}</option>
+                  <option value="work">{labels?.category_work || "کار"}</option>
+                  <option value="personal">{labels?.category_personal || "شخصی"}</option>
+                  <option value="learning">{labels?.category_learning || "یادگیری"}</option>
+                  <option value="health">{labels?.category_health || "سلامت"}</option>
+                  <option value="free">{labels?.category_free || "زمان آزاد"}</option>
                 </select>
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">{t("adminTask.TaskModal.energy_label")}</label>
+                <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
+                  {labels?.energy_label || "سطح انرژی"}
+                </label>
                 <select value={energyLevel} onChange={(e) => setEnergyLevel(e.target.value as any)} className="bg-[#07070a] border border-white/5 text-xs text-gray-300 rounded-xl px-3 h-11 focus:outline-none w-full">
-                  <option value="low">{t("adminTask.TaskModal.energy_low")}</option>
-                  <option value="medium">{t("adminTask.TaskModal.energy_medium")}</option>
-                  <option value="high">{t("adminTask.TaskModal.energy_high")}</option>
+                  <option value="low">{labels?.energy_low || "پایین"}</option>
+                  <option value="medium">{labels?.energy_medium || "متوسط"}</option>
+                  <option value="high">{labels?.energy_high || "بالا"}</option>
                 </select>
               </div>
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">{t("adminTask.TaskModal.description_label")}</label>
-              <textarea rows={3} placeholder={t("adminTask.TaskModal.description_placeholder")} value={description} onChange={(e) => setDescription(e.target.value)} className="bg-[#07070a] border border-white/5 rounded-xl p-3 text-xs text-white focus:outline-none resize-none w-full" />
+              <label className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
+                {labels?.description_label || "توضیحات"}
+              </label>
+              <textarea rows={3} placeholder={labels?.description_placeholder || "جزئیات..."} value={description} onChange={(e) => setDescription(e.target.value)} className="bg-[#07070a] border border-white/5 rounded-xl p-3 text-xs text-white focus:outline-none resize-none w-full" />
             </div>
 
             <div className="p-3 sm:p-4 rounded-xl border border-white/3 bg-white/[0.01] flex items-center justify-between cursor-pointer w-full" onClick={() => setIsBlocking(!isBlocking)}>
               <div className="pr-3">
-                <h4 className="text-xs font-bold text-gray-200">{t("adminTask.TaskModal.blocking_title")}</h4>
-                <p className="text-[10px] text-gray-500 mt-0.5 leading-relaxed">{t("adminTask.TaskModal.blocking_desc")}</p>
+                <h4 className="text-xs font-bold text-gray-200">{labels?.blocking_title || "وظیفه مسدودکننده"}</h4>
+                <p className="text-[10px] text-gray-500 mt-0.5 leading-relaxed">{labels?.blocking_desc || "توضیحات..."}</p>
               </div>
               <div className={`relative w-10 h-5 rounded-full transition-colors duration-300 shrink-0 ${isBlocking ? "bg-red-500/80 shadow-[0_0_10px_rgba(239,68,68,0.3)]" : "bg-gray-700"}`}>
                 <div className={`absolute top-0.5 ${locale === "en" ? "left-0.5" : "right-0.5"} w-4 h-4 bg-white rounded-full transition-transform duration-300 ${isBlocking ? (locale === "en" ? "translate-x-5" : "-translate-x-5") : "translate-x-0"}`} />
@@ -180,23 +200,23 @@ export default function TaskModal(props: TaskModalProps) {
                   </svg>
                 </div>
                 <div>
-                  <span className="text-[11px] font-bold text-emerald-400 block select-none">💾 ذخیره ترکیب فعلی به عنوان قالب جدید</span>
-                  <span className="text-[9px] text-gray-500 block">برای استفاده سریع در روزهای آینده</span>
+                  <span className="text-[11px] font-bold text-emerald-400 block select-none">{labels?.save_template_title || "ذخیره به عنوان قالب"}</span>
+                  <span className="text-[9px] text-gray-500 block">{labels?.save_template_subtitle || "استفاده سریع"}</span>
                 </div>
               </label>
             )}
 
             {isEditMode && props.taskToEdit?.recurrence !== "none" && (
               <div className="p-3 sm:p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 w-full">
-                <h4 className="text-xs font-bold text-amber-400 mb-3">⚠️ دامنه تغییرات وظیفه تکرارشونده</h4>
+                <h4 className="text-xs font-bold text-amber-400 mb-3">{labels?.recurrence_warning_title || "دامنه تغییرات"}</h4>
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-6">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input type="radio" name="editScope" checked={editScope === "single"} onChange={() => setEditScope("single")} className="accent-amber-500 w-4 h-4" />
-                    <span className="text-[11px] text-gray-300 font-medium">فقط در همین روز</span>
+                    <span className="text-[11px] text-gray-300 font-medium">{labels?.recurrence_scope_single || "فقط همین روز"}</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input type="radio" name="editScope" checked={editScope === "all"} onChange={() => setEditScope("all")} className="accent-amber-500 w-4 h-4" />
-                    <span className="text-[11px] text-gray-300 font-medium">در تمام روزها</span>
+                    <span className="text-[11px] text-gray-300 font-medium">{labels?.recurrence_scope_all || "همه روزها"}</span>
                   </label>
                 </div>
               </div>
@@ -206,14 +226,18 @@ export default function TaskModal(props: TaskModalProps) {
           <div className="shrink-0 p-4 border-t border-white/5 bg-[#0a0a0f] flex flex-col sm:flex-row gap-3">
             {isEditMode && (
               <button type="button" onClick={handleDelete} disabled={isSubmitting} className="w-full sm:w-auto px-4 bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 text-red-400 font-bold text-xs py-3 sm:py-2.5 rounded-xl transition-all order-3 sm:order-1">
-                {t("adminTask.TaskModal.btn_delete")}
+                {labels?.btn_delete || "حذف وظیفه"}
               </button>
             )}
             <button type="button" onClick={props.onClose} className="w-full sm:flex-1 bg-transparent border border-white/10 hover:bg-white/5 text-gray-300 font-bold text-xs py-3 sm:py-2.5 rounded-xl transition-all order-2">
-              {t("adminTask.TaskModal.btn_cancel")}
+              {labels?.btn_cancel || "انصراف"}
             </button>
             <button type="submit" disabled={isSubmitting || !title.trim()} className={`w-full sm:flex-1 font-bold text-xs py-3 sm:py-2.5 rounded-xl transition-all order-1 sm:order-3 ${isEditMode ? "bg-amber-500 hover:bg-amber-600 text-black shadow-[0_0_15px_#f59e0b]" : "bg-emerald-500 hover:bg-emerald-600 text-black shadow-[0_0_15px_#10b981]"}`}>
-              {isSubmitting ? t("adminTask.TaskModal.btn_submitting") : isEditMode ? t("adminTask.TaskModal.btn_submit_edit") : t("adminTask.TaskModal.btn_submit_create")}
+              {isSubmitting
+                ? (labels?.btn_submitting || "در حال ثبت...")
+                : isEditMode
+                  ? (labels?.btn_submit_edit || "ذخیره تغییرات")
+                  : (labels?.btn_submit_create || "ثبت وظیفه")}
             </button>
           </div>
         </form>
