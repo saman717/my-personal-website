@@ -1,6 +1,8 @@
 import Footer from '@/components/layout/footer/Footer';
 import Header from '@/components/layout/Header/Header';
 import { ToastProvider } from '@/context/ToastContext';
+import { Suspense } from 'react';
+import NavigationProgress from '@/components/Ui/NavigationProgress';
 
 export default async function LocaleLayout({
   children,
@@ -14,6 +16,9 @@ export default async function LocaleLayout({
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} lang={locale} className="flex flex-col min-h-screen">
+      <Suspense fallback={null}>
+        <NavigationProgress />
+      </Suspense>
       <Header locale={locale} />
       <ToastProvider>
         <main className="flex-1">{children}</main>

@@ -150,85 +150,36 @@ export const taskTemplates = pgTable('task_templates', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-// ─── Portfolio ────────────────────────────────────────────────────────────────
+// ۷. جدول نمونه کارها (Portfolio Projects)
+export const projects = pgTable('projects', {
+  id: uuid('id').defaultRandom().primaryKey(),
 
-// ۷. جدول اصلی پروژه‌ها
-export const portfolioProjects = pgTable('portfolio_projects', {
-  id:          uuid('id').defaultRandom().primaryKey(),
-  slug:        text('slug').notNull().unique(),
-  status:      text('status', { enum: ['draft', 'published', 'archived'] }).default('draft').notNull(),
-  sortOrder:   integer('sort_order').default(0).notNull(),
-  publishedAt: timestamp('published_at', { withTimezone: true }),
-  createdAt:   timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  updatedAt:   timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-}, (table) => ({
-  sortIdx: index('portfolio_projects_sort_idx').on(table.sortOrder),
-}));
+  // عناوین دو زبانه
+  titleFa: text('title_fa').notNull(),
+  titleEn: text('title_en').notNull(),
 
-// ۸. ترجمه‌های هر پروژه (fa / en)
-export const portfolioProjectTranslations = pgTable('portfolio_project_translations', {
-  id:             uuid('id').defaultRandom().primaryKey(),
-  projectId:      uuid('project_id').references(() => portfolioProjects.id, { onDelete: 'cascade' }).notNull(),
-  locale:         text('locale', { enum: ['fa', 'en'] }).notNull(),
-  title:          text('title').notNull(),
-  brief:          text('brief').notNull(),
-  badge:          text('badge'),
-  metaRole:       text('meta_role'),
-  metaPlatform:   text('meta_platform'),
-  metaCategory:   text('meta_category'),
-  metaStatus:     text('meta_status'),
-  challengeTitle: text('challenge_title'),
-  challengeText:  text('challenge_text'),
-  solutionTitle:  text('solution_title'),
-  solutionSteps:  jsonb('solution_steps').$type<{ step: string; detail?: string }[]>(),
-  resultsTitle:   text('results_title'),
-  resultsItems:   jsonb('results_items').$type<{ label: string; value: string }[]>(),
-  techStackTitle: text('tech_stack_title'),
-  createdAt:      timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  updatedAt:      timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-});
+  // توضیحات دو زبانه
+  descFa: text('desc_fa').notNull(),
+  descEn: text('desc_en').notNull(),
 
-// ۹. محتوای HTML آزاد (مجزا برای توسعه‌پذیری)
-export const portfolioProjectContent = pgTable('portfolio_project_content', {
-  id:          uuid('id').defaultRandom().primaryKey(),
-  projectId:   uuid('project_id').references(() => portfolioProjects.id, { onDelete: 'cascade' }).notNull(),
-  locale:      text('locale', { enum: ['fa', 'en'] }).notNull(),
-  contentHtml: text('content_html').default('').notNull(),
-  createdAt:   timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  updatedAt:   timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-});
+  // دسته‌بندی: web | bot | tool | fullstack | desktop
+  category: text('category').notNull().default('web'),
 
-// ۱۰. تکنولوژی‌ها (جدول مستقل)
-export const portfolioTechnologies = pgTable('portfolio_technologies', {
-  id:        uuid('id').defaultRandom().primaryKey(),
-  name:      text('name').notNull(),
-  slug:      text('slug').notNull().unique(),
-  icon:      text('icon'),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-});
+  // تگ‌های تکنولوژی — به صورت آرایه JSON ذخیره می‌شه
+  tags: jsonb('tags').$type<string[]>().notNull().default([]),
 
-// ۱۱. رابط پروژه ↔ تکنولوژی
-export const portfolioProjectTechnologies = pgTable('portfolio_project_technologies', {
-  projectId:    uuid('project_id').references(() => portfolioProjects.id, { onDelete: 'cascade' }).notNull(),
-  technologyId: uuid('technology_id').references(() => portfolioTechnologies.id, { onDelete: 'cascade' }).notNull(),
-});
+  // لینک‌ها
+  githubUrl: text('github_url'),
+  demoUrl: text('demo_url'),
 
-// ۱۲. تصاویر هر پروژه
-export const portfolioProjectImages = pgTable('portfolio_project_images', {
-  id:        uuid('id').defaultRandom().primaryKey(),
-  projectId: uuid('project_id').references(() => portfolioProjects.id, { onDelete: 'cascade' }).notNull(),
-  url:       text('url').notNull(),
-  alt:       text('alt'),
-  isPrimary: integer('is_primary').default(0).notNull(), // 1 = primary, 0 = not (Supabase stores as integer)
-  sortOrder: integer('sort_order').default(0).notNull(),
-});
+  // نمایش
+  isFeatured: boolean('is_featured').default(false).notNull(),
+  isWip: boolean('is_wip').default(false).notNull(),
+  sortOrder: integer('sort_order').default(0).notNull(), // برای مرتب‌سازی دستی
 
-// ۱۳. لینک‌های هر پروژه (github, demo, ...)
-export const portfolioProjectLinks = pgTable('portfolio_project_links', {
-  id:        uuid('id').defaultRandom().primaryKey(),
-  projectId: uuid('project_id').references(() => portfolioProjects.id, { onDelete: 'cascade' }).notNull(),
-  type:      text('type').notNull(), // 'github' | 'demo' | 'case_study' | ...
-  url:       text('url').notNull(),
-  label:     text('label'),
-  sortOrder: integer('sort_order').default(0).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => {
+  return {
+    sortIdx: index('projects_sort_idx').on(table.sortOrder),
+  };
 });
