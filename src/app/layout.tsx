@@ -5,12 +5,20 @@ import { Vazirmatn } from 'next/font/google';
 const vazirmatn = Vazirmatn({
   subsets: ['arabic'],
   variable: '--font-vazirmatn',
-  display: 'swap',
-  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+  display: 'optional', // از 'swap' به 'optional'
+  weight: ['400', '500', '600', '700'], // فقط وزن‌هایی که واقعاً استفاده می‌کنی
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://samankhoshnoud.ir'),
+  icons: {
+    icon: [
+      { url: '/icons/MSKH(32).webp', sizes: '32x32', type: 'image/webp' },
+      { url: '/icons/MSKH(16).webp', sizes: '16x16', type: 'image/webp' },
+    ],
+    apple: { url: '/icons/MSKH(180).webp', sizes: '180x180', type: 'image/webp' },
+    shortcut: '/icons/MSKH(32).webp',
+  },
 };
 
 export default function RootLayout({

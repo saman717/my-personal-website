@@ -24,3 +24,8 @@ export default async function LocaleLayout({
       <Header locale={locale} />
       <ToastProvider>
         <main className="flex-1">{children}</main>
+      </ToastProvider>
+      <Footer locale={locale} />
+    </div>
+  );
+}

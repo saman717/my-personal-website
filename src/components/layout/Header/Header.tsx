@@ -1,7 +1,9 @@
 import { t } from '@/lib/translate';
 import Link from 'next/link';
+import Image from 'next/image';
 import LanguageSwitcher from './LanguageSwitcher';
 import MobileMenu from './MobileMenu';
+
 export default async function Header({ locale }: { locale: string }) {
   const navItems = [
     { key: 'home', href: '/' },
@@ -27,11 +29,8 @@ export default async function Header({ locale }: { locale: string }) {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Brand */}
-          <Link
-            href={`/${locale}`}
-            className="text-white text-xl font-bold tracking-wide hover:text-gray-300 transition-colors shrink-0"
-          >
-            {locale === 'fa' ? 'سامان خوشنود' : 'Saman Khoshnood'}
+          <Link href={`/${locale}`} className="shrink-0">
+            <Image src="/images/MSKH.webp" alt="Saman Khoshnood" height={120} width={120} className="h-22 w-auto" />
           </Link>
 
           {/* Desktop Nav */}

@@ -7,6 +7,7 @@ import Telegram from '../../../../public/icons/Telegram.svg';
 import Instageram from '../../../../public/icons/Instageram.svg';
 import WhatsApp from '../../../../public/icons/WhatsApp.svg';
 import Bale from '../../../../public/icons/Bale.svg';
+import Image from 'next/image';
 
 // --- Types ---
 interface FooterProps {
@@ -36,11 +37,11 @@ const QUICK_LINKS: NavLink[] = [
 
 const SOCIAL_LINKS: SocialLink[] = [
     { id: 'github', label: { fa: 'گیت هاب', en: 'GitHub' }, href: 'https://github.com/samankhoshnood', icon: <GitHubIcon className="size-8" /> },
-    { id: 'whatsapp', label: { fa: 'واتس آپ', en: 'WhatsApp' }, href: '#',icon: <WhatsApp className="size-8 text-[#25D366]" /> },
-    { id: 'linkedin', label: { fa: 'لینکدین', en: 'LinkedIn' }, href: '#', icon: <Linkdin className="size-8 text-blue-700" /> },
-    { id: 'bale', label: { fa: 'بله', en: 'Bale' }, href: '#',icon: <Bale className="size-8 text-[#00BFA5]" /> },
-    { id: 'telegram', label: { fa: 'تلگرام', en: 'Telegram' }, href: '#', icon: <Telegram className="size-8 text-[#0088cc]" /> },
-    { id: 'instagram', label: { fa: 'اینستاگرام', en: 'Instagram' }, href: '#',icon: <Instageram className="size-8 text-[#E4405F]" /> },
+    { id: 'whatsapp', label: { fa: 'واتس آپ', en: 'WhatsApp' }, href: 'https://wa.me/989935867279', icon: <WhatsApp className="size-8 text-[#25D366]" /> },
+    { id: 'linkedin', label: { fa: 'لینکدین', en: 'LinkedIn' }, href: 'https://www.linkedin.com/in/saman-khoshnoud/', icon: <Linkdin className="size-8 text-blue-700" /> },
+    { id: 'telegram', label: { fa: 'تلگرام', en: 'Telegram' }, href: 'https://t.me/MSkh2112', icon: <Telegram className="size-8 text-[#0088cc]" /> },
+    { id: 'instagram', label: { fa: 'اینستاگرام', en: 'Instagram' }, href: 'https://www.instagram.com/mohamadkhoshnood.10/', icon: <Instageram className="size-8 text-[#E4405F]" /> },
+    { id: 'bale', label: { fa: 'بله', en: 'Bale' }, href: 'https://ble.ir/Mommdd05', icon: <Bale className="size-8 text-[#00BFA5]" /> },
 ];
 
 export default async function Footer({ locale }: FooterProps) {
@@ -55,7 +56,7 @@ export default async function Footer({ locale }: FooterProps) {
             className="w-full bg-[#1E1E24]/70 backdrop-blur-3xl shadow-lg shadow-black/20 text-white/90 border-t border-white/10 mt-30"
             dir={isRTL ? "rtl" : "ltr"}
         >
-            <div className="max-w-7xl mx-auto px-6 py-12 md:py-16">
+            <div className="max-w-7xl mx-auto px-6 py-12 md:py-16 items-center" >
                 <div className={`grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-0 ${isRTL ? 'md:divide-x' : ''} md:divide-x md:divide-white/20`}>
 
                     {/* ستون اول: معرفی */}
@@ -112,6 +113,13 @@ export default async function Footer({ locale }: FooterProps) {
                             ))}
                         </ul>
                     </section>
+                </div>
+                <div className="flex justify-center ">
+                    <img
+                        src="/images/MSKH.webp"
+                        alt="Saman Khoshnood"
+                        className="w-64 md:w-80 lg:w-96 h-auto opacity-90 hover:opacity-100 transition-opacity"
+                    />
                 </div>
             </div>
 

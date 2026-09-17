@@ -11,6 +11,9 @@ import {
 } from '@/db/schema';
 import { eq, and, asc } from 'drizzle-orm';
 
+export const revalidate = 4600;
+export const dynamicParams = true;
+
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://samankhoshnoud.ir';
 
 type Props = { params: Promise<{ locale: string }> };

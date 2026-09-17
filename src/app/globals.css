@@ -3,6 +3,11 @@
 @theme {
   --font-sans: var(--font-vazirmatn), ui-sans-serif, system-ui, sans-serif;
 }
+@layer base {
+  html {
+    font-display: optional;
+  }
+}
 
 :root {
   /* 🎨 پالت رنگی اختصاصی عکس داشبورد تو */
