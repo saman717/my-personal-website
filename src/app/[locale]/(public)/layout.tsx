@@ -1,7 +1,6 @@
 import Footer from '@/components/layout/footer/Footer';
 import Header from '@/components/layout/Header/Header';
-import { ToastProvider } from "@/context/ToastContext";
-
+import { ToastProvider } from '@/context/ToastContext';
 
 export default async function LocaleLayout({
   children,
@@ -14,7 +13,7 @@ export default async function LocaleLayout({
   const isRTL = locale === 'fa';
 
   return (
-    <div dir={isRTL ? 'rtl' : 'ltr'} className="flex flex-col min-h-screen">
+    <div dir={isRTL ? 'rtl' : 'ltr'} lang={locale} className="flex flex-col min-h-screen">
       <Header locale={locale} />
       <ToastProvider>
         <main className="flex-1">{children}</main>
