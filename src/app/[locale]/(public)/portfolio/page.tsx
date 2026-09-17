@@ -78,7 +78,7 @@ async function getPortfolioProjects(locale: string) {
   const translations = await db
     .select()
     .from(portfolioProjectTranslations)
-    .where(eq(portfolioProjectTranslations.locale, locale));
+    .where(eq(portfolioProjectTranslations.locale, locale as 'fa' | 'en'));
 
   // تصویر اصلی هر پروژه (is_primary در Supabase integer است: 1 = primary)
   const images = await db
@@ -117,18 +117,18 @@ export default async function PortfolioPage({ params }: Props) {
   const projects = await getPortfolioProjects(locale);
 
   const t = {
-    badge:       isPersian ? 'نمونه کارها' : 'Portfolio',
-    heroTitle:   isPersian ? 'پروژه‌هایی که ساختم' : "Projects I've Built",
-    heroSub:     isPersian
+    badge: isPersian ? 'نمونه کارها' : 'Portfolio',
+    heroTitle: isPersian ? 'پروژه‌هایی که ساختم' : "Projects I've Built",
+    heroSub: isPersian
       ? 'مجموعه‌ای از پروژه‌های واقعی که در طول مسیرم توسعه دادم'
       : 'A collection of real-world projects developed along my journey',
-    empty:       isPersian ? 'هنوز پروژه‌ای منتشر نشده' : 'No projects published yet',
+    empty: isPersian ? 'هنوز پروژه‌ای منتشر نشده' : 'No projects published yet',
     viewProject: isPersian ? 'مشاهده پروژه' : 'View Project',
-    ctaTitle:    isPersian ? 'می‌خوای با هم یه پروژه بسازیم؟' : 'Want to build something together?',
-    ctaDesc:     isPersian
+    ctaTitle: isPersian ? 'می‌خوای با هم یه پروژه بسازیم؟' : 'Want to build something together?',
+    ctaDesc: isPersian
       ? 'اگه ایده‌ای داری که می‌خوای به واقعیت تبدیل بشه، بیا با هم صحبت کنیم.'
       : "If you have an idea you want turned into reality, let's talk.",
-    ctaContact:  isPersian ? 'تماس با من' : 'Contact Me',
+    ctaContact: isPersian ? 'تماس با من' : 'Contact Me',
     ctaServices: isPersian ? 'مشاهده خدمات' : 'View Services',
   };
 
