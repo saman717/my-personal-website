@@ -4,6 +4,27 @@ import { ToastProvider } from '@/context/ToastContext';
 import { PersonJsonLd } from '@/components/seo/JsonLd';
 import { Suspense } from 'react';
 import NavigationProgress from '@/components/Ui/NavigationProgress';
+import type { Metadata } from 'next';
+
+const SITE_URL = 'https://samankhoshnoud.ir';
+
+type Props = { params: Promise<{ locale: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const canonical = `${SITE_URL}/${locale}`;
+
+  return {
+    alternates: {
+      canonical,
+      languages: {
+        'fa-IR': `${SITE_URL}/fa`,
+        'en-US': `${SITE_URL}/en`,
+        'x-default': `${SITE_URL}/fa`,
+      },
+    },
+  };
+}
 
 export default async function LocaleLayout({
   children,

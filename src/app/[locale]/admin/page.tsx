@@ -1,44 +1,44 @@
-import StatsGrid from "@/components/admin/dashboard/StatsGrid";
-import AnalyticsChart from "@/components/admin/dashboard/AnalyticsChart";
-import ServerTelemetryCard from "@/components/admin/dashboard/ServerTelemetryCard";
-import RecentMessagesCard from "@/components/admin/dashboard/RecentMessagesCard";
-import ActivityTimelineCard from "@/components/admin/dashboard/ActivityTimelineCard";
+import './globals.css';
+import type { Metadata } from 'next';
+import { Vazirmatn } from 'next/font/google';
 
-// ۱. 🌟 اضافه کردن ایمپورت برای خواندن دیکشنری سروری
-import { getDictionary } from "@/lib/translate";
+const vazirmatn = Vazirmatn({
+  subsets: ['arabic'],
+  variable: '--font-vazirmatn',
+  display: 'optional',
+  weight: ['400', '500', '600', '700'],
+});
 
-export default async function AdminPage({
-  params,
+const SITE_URL = 'https://samankhoshnoud.ir';
+
+export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? SITE_URL),
+  alternates: {
+    canonical: SITE_URL,
+    languages: {
+      'fa-IR': `${SITE_URL}/fa`,
+      'en-US': `${SITE_URL}/en`,
+      'x-default': `${SITE_URL}/fa`,
+    },
+  },
+  icons: {
+    icon: [
+      { url: '/icons/MSKH(32).webp', sizes: '32x32', type: 'image/webp' },
+      { url: '/icons/MSKH(16).webp', sizes: '16x16', type: 'image/webp' },
+    ],
+    apple: { url: '/icons/MSKH(180).webp', sizes: '180x180', type: 'image/webp' },
+    shortcut: '/icons/MSKH(32).webp',
+  },
+};
+
+export default function RootLayout({
+  children,
 }: {
-  params: Promise<{ locale: string }> | { locale: string };
+  children: React.ReactNode;
 }) {
-  const resolvedParams = await params;
-  const locale = resolvedParams.locale;
-
-  // ۲. 🌟 خواندن فایل JSON و ساختن متغیر dict
-  const dict = await getDictionary(locale);
-
   return (
-    <div className="flex flex-col w-full gap-5 pb-10">
-      {/* ردیف اول: کارت‌های آماری */}
-      {/* حالا dict کاملاً شناخته شده است */}
-      <StatsGrid labels={dict.admin.dashboard.stats} />
-
-      {/* ردیف دوم: نمودار (دو ستون) و تلمتری (یک ستون) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 w-full">
-        <div className="lg:col-span-2">
-          <AnalyticsChart labels={dict.admin.dashboard.chart} />
-        </div>
-        <div className="lg:col-span-1">
-          <ServerTelemetryCard labels={dict.admin.dashboard.telemetry} />
-        </div>
-      </div>
-
-      {/* ردیف سوم: پیام‌های اخیر و تایم‌لاین فعالیت‌ها */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 w-full mt-2">
-        <RecentMessagesCard locale={locale} labels={dict.admin.dashboard.messagesList} />
-        <ActivityTimelineCard labels={dict.admin.dashboard.activity} />
-      </div>
-    </div>
+    <html suppressHydrationWarning className={vazirmatn.variable}>
+      <body className="font-sans">{children}</body>
+    </html>
   );
 }
