@@ -515,5 +515,59 @@
     "descPlaceholder": "Briefly describe your project or needs...",
     "descRequired": "Description is required",
     "descMinLength": "Description must be at least 10 characters"
+  },
+   "blog": {
+    "badge": "Blog",
+    "hero": {
+      "title": "Articles & Notes",
+      "subtitle": "Thoughts, experiences, and lessons learned from the world of programming, design, and software development"
+    },
+    "coming_soon": "Coming Soon",
+    "coming_soon_description": "I'm working on my first articles — covering React, Next.js, software architecture, and real-world development experiences.",
+    "empty_title": "No articles published yet",
+    "empty_description": "The first article is coming soon. Follow me on social media to be notified when new content drops.",
+    "categories": {
+      "all": "All",
+      "react": "React",
+      "nextjs": "Next.js",
+      "backend": "Backend",
+      "tools": "Tools"
+    },
+    "read_more": "Read More",
+    "min_read": "min read",
+    "notify_cta": {
+      "title": "Want to be notified early?",
+      "description": "Follow me on LinkedIn or GitHub to get notified as soon as a new article is published.",
+      "linkedin": "LinkedIn",
+      "github": "GitHub"
+    }
+  },
+  "portfolio": {
+    "badge": "Portfolio",
+    "hero": {
+      "title": "Projects I've Built",
+      "subtitle": "A collection of real-world, experimental, and open-source projects developed along my journey"
+    },
+    "all_projects": "All Projects",
+    "view_project": "View Project",
+    "view_code": "Source Code",
+    "categories": {
+      "all": "All",
+      "web": "Web",
+      "bot": "Bot",
+      "tool": "Tool",
+      "fullstack": "Full-Stack"
+    },
+    "coming_soon": "Coming Soon",
+    "coming_soon_description": "I'm curating my best projects. They'll be here soon.",
+    "wip_badge": "In Development",
+    "featured": "Featured Project",
+    "tech_stack": "Tech Stack",
+    "cta": {
+      "title": "Want to build something together?",
+      "description": "If you have an idea you want turned into reality, let's talk.",
+      "contact": "Contact Me",
+      "services": "View Services"
+    }
   }
 }

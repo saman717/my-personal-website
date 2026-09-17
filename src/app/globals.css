@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: var(--font-vazirmatn), ui-sans-serif, system-ui, sans-serif;
+}
+
 :root {
   /* 🎨 پالت رنگی اختصاصی عکس داشبورد تو */
   --color-bg-primary: #07070a;

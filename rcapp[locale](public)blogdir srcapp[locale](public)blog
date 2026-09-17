@@ -1,0 +1,20 @@
+[33m5bacd6a[m[33m ([m[1;35mrefs/stash[m[33m)[m WIP on feature/portfolio: 85da1fe fix: move JSON-LD to <head> via head.tsx for Google Rich Results
+[33m3017a20[m index on feature/portfolio: 85da1fe fix: move JSON-LD to <head> via head.tsx for Google Rich Results
+[33mae22c94[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m fix: restore layout with ToastProvider and add PersonJsonLd
+[33m034f1a8[m fix: render JSON-LD in layout instead of deprecated head.tsx
+[33m9855612[m merge: JSON-LD head fix from feature/portfolio
+[33m85da1fe[m fix: move JSON-LD to <head> via head.tsx for Google Rich Results
+[33m5956b88[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/portfolio[m[33m)[m fix: move JSON-LD to <head> via head.tsx for Google Rich Results
+[33m40ef5b1[m Merge pull request #16 from saman717/develop
+[33mca0edfc[m Merge pull request #15 from saman717/feature/portfolio
+[33mcf92d0a[m feat(seo): add metadata, JSON-LD structured data, and i18n proxy
+[33mf6d9c1e[m[33m ([m[1;31morigin/develop[m[33m, [m[1;32mdevelop[m[33m)[m Merge pull request #14 from saman717/refactor/i18n-optimization
+[33m70d666d[m refactor: optimize i18n architecture layer
+[33m945e161[m chore: save new i18n hook architecture before syncing with main
+[33mbb33b4d[m fix: update i18n JSON structure for ContactForm placeholders and errors
+[33m6a10a40[m fix: update JSON mapping in ContactSection to resolve Vercel build crash
+[33m91fe77b[m chore: merge feature/contact-page to main
+[33m757e20e[m fix: resolve undefined heading property causing Vercel build crash
+[33mff32d5e[m Merge pull request #13 from saman717/develop
+[33m57bd505[m Merge pull request #12 from saman717/feature/contact-page
+[33m44f66e4[m feat(contact): implement localized contact page with dynamic RTL/LTR handling
