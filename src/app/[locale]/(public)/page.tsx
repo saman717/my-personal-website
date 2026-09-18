@@ -78,6 +78,7 @@ export default async function HomePage({ params }: Props) {
 
   return (
     <>
+      <PersonJsonLd locale={locale} />
       <HeroSection locale={locale} />
       <SkillsSection locale={locale} />
       <ProjectsSection locale={locale} />
