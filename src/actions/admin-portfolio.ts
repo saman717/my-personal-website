@@ -9,6 +9,7 @@ import {
   portfolioProjectTechnologies,
   portfolioProjectLinks,
   portfolioProjectImages,
+  portfolioTechnologies,
 } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 
@@ -28,7 +29,9 @@ export type ProjectFormData = {
   fa_challengeTitle?: string;
   fa_challengeText?: string;
   fa_solutionTitle?: string;
+  fa_solutionSteps?: string; // JSON: {step: string, detail?: string}[]
   fa_resultsTitle?: string;
+  fa_resultsItems?: string; // JSON: {label: string, value: string}[]
   fa_techStackTitle?: string;
   // ترجمه انگلیسی
   en_title: string;
@@ -41,7 +44,9 @@ export type ProjectFormData = {
   en_challengeTitle?: string;
   en_challengeText?: string;
   en_solutionTitle?: string;
+  en_solutionSteps?: string; // JSON: {step: string, detail?: string}[]
   en_resultsTitle?: string;
+  en_resultsItems?: string; // JSON: {label: string, value: string}[]
   en_techStackTitle?: string;
   // محتوای HTML
   fa_contentHtml?: string;
@@ -185,6 +190,61 @@ export async function updateImageAlt(imageId: string, alt: string) {
   return { success: true };
 }
 
+// ─── Technologies: Get all ────────────────────────────────────────────────────
+export async function getTechnologies() {
+  return db
+    .select({
+      id: portfolioTechnologies.id,
+      name: portfolioTechnologies.name,
+      slug: portfolioTechnologies.slug,
+      icon: portfolioTechnologies.icon,
+      website: portfolioTechnologies.website,
+    })
+    .from(portfolioTechnologies)
+    .orderBy(portfolioTechnologies.name);
+}
+
+// ─── Technologies: Create ─────────────────────────────────────────────────────
+export async function createTechnology(name: string, slug: string, icon?: string, website?: string) {
+  const [tech] = await db
+    .insert(portfolioTechnologies)
+    .values({
+      name: name.trim(),
+      slug: slug.trim().toLowerCase(),
+      icon: icon?.trim() || null,
+      website: website?.trim() || null,
+    })
+    .returning();
+  return { success: true, tech };
+}
+
+// ─── Technologies: Update ─────────────────────────────────────────────────────
+export async function updateTechnology(id: string, name: string, slug: string, icon?: string, website?: string) {
+  await db
+    .update(portfolioTechnologies)
+    .set({
+      name: name.trim(),
+      slug: slug.trim().toLowerCase(),
+      icon: icon?.trim() || null,
+      website: website?.trim() || null,
+    })
+    .where(eq(portfolioTechnologies.id, id));
+  return { success: true };
+}
+
+// ─── Technologies: Delete ─────────────────────────────────────────────────────
+export async function deleteTechnology(id: string) {
+  // ابتدا از junction table حذف کن تا FK constraint نشکند
+  await db
+    .delete(portfolioProjectTechnologies)
+    .where(eq(portfolioProjectTechnologies.technologyId, id));
+  // سپس خود تکنولوژی را حذف کن
+  await db
+    .delete(portfolioTechnologies)
+    .where(eq(portfolioTechnologies.id, id));
+  return { success: true };
+}
+
 // ─── Internal: upsert translations + content + links + techs ─────────────────
 async function upsertTranslationsAndContent(projectId: string, data: ProjectFormData) {
   const locales = ['fa', 'en'] as const;
@@ -215,7 +275,15 @@ async function upsertTranslationsAndContent(projectId: string, data: ProjectForm
       challengeTitle: data[`${prefix}_challengeTitle`] ?? null,
       challengeText: data[`${prefix}_challengeText`] ?? null,
       solutionTitle: data[`${prefix}_solutionTitle`] ?? null,
+      solutionSteps: (() => {
+        try { return data[`${prefix}_solutionSteps`] ? JSON.parse(data[`${prefix}_solutionSteps`] as string) : null; }
+        catch { return null; }
+      })(),
       resultsTitle: data[`${prefix}_resultsTitle`] ?? null,
+      resultsItems: (() => {
+        try { return data[`${prefix}_resultsItems`] ? JSON.parse(data[`${prefix}_resultsItems`] as string) : null; }
+        catch { return null; }
+      })(),
       techStackTitle: data[`${prefix}_techStackTitle`] ?? null,
       updatedAt: new Date(),
     };

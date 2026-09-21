@@ -3,6 +3,23 @@ import { portfolioProjects, portfolioProjectTranslations } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import Link from 'next/link';
 import AdminPortfolioActions from '@/components/admin/portfolio/AdminPortfolioActions';
+import TechnologiesManagerPanel from '@/components/admin/portfolio/TechnologiesManagerPanel';
+
+// ─── Retry برای Supabase free tier ────────────────────────────────────────────
+// وقتی Supabase دیتابیس رو بخوابونه، اولین query با کد 57014 کنسل میشه.
+// این helper تا ۳ بار تلاش می‌کنه — بین هر بار کمی صبر می‌کنه تا DB بیدار بشه.
+async function dbRetry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await fn();
+    } catch (err: unknown) {
+      const code = (err as any)?.code ?? (err as any)?.cause?.code;
+      if (code !== '57014' || i === attempts - 1) throw err;
+      await new Promise<void>((r) => setTimeout(r, 800 * (i + 1)));
+    }
+  }
+  throw new Error('unreachable');
+}
 
 export default async function AdminPortfolioPage({
   params,
@@ -12,23 +29,35 @@ export default async function AdminPortfolioPage({
   const resolvedParams = await params;
   const locale = resolvedParams.locale;
 
-  // فچ همه پروژه‌ها با عنوان فارسی
-  const projects = await db
-    .select({
-      id: portfolioProjects.id,
-      slug: portfolioProjects.slug,
-      status: portfolioProjects.status,
-      sortOrder: portfolioProjects.sortOrder,
-      updatedAt: portfolioProjects.updatedAt,
-      title: portfolioProjectTranslations.title,
-    })
-    .from(portfolioProjects)
-    .leftJoin(
-      portfolioProjectTranslations,
-      eq(portfolioProjectTranslations.projectId, portfolioProjects.id)
-    )
-    .where(eq(portfolioProjectTranslations.locale, 'fa'))
-    .orderBy(portfolioProjects.sortOrder);
+  // ─── هر query جداگانه داخل dbRetry — تا unhandledRejection نداشته باشیم ────
+  // اگه Promise.all رو wrap کنیم، query دوم بعد از reject اولی بدون listener میمونه
+  const [allProjects, faTranslations] = await Promise.all([
+    dbRetry(() =>
+      db
+        .select({
+          id: portfolioProjects.id,
+          slug: portfolioProjects.slug,
+          status: portfolioProjects.status,
+          sortOrder: portfolioProjects.sortOrder,
+          updatedAt: portfolioProjects.updatedAt,
+        })
+        .from(portfolioProjects)
+        .orderBy(portfolioProjects.sortOrder)
+    ),
+    dbRetry(() =>
+      db
+        .select({
+          projectId: portfolioProjectTranslations.projectId,
+          title: portfolioProjectTranslations.title,
+        })
+        .from(portfolioProjectTranslations)
+        .where(eq(portfolioProjectTranslations.locale, 'fa'))
+    ),
+  ]);
+
+  // ترکیب در حافظه — بدون JOIN در SQL
+  const titleMap = new Map(faTranslations.map(t => [t.projectId, t.title]));
+  const projects = allProjects.map(p => ({ ...p, title: titleMap.get(p.id) ?? null }));
 
   const statusColors: Record<string, string> = {
     published: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
@@ -45,22 +74,27 @@ export default async function AdminPortfolioPage({
   return (
     <div className="flex flex-col gap-6" dir="rtl">
 
-      {/* ─── Header ────────────────────────────────────────────────────────── */}
+      {/* ─── Header ─────────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">نمونه کارها</h1>
           <p className="text-sm text-gray-500 mt-0.5">{projects.length} پروژه در دیتابیس</p>
         </div>
-        <Link
-          href={`/${locale}/admin/portfolio/new`}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium transition-all duration-200 shadow-[0_0_20px_rgba(147,51,234,0.25)] hover:shadow-[0_0_25px_rgba(147,51,234,0.45)]"
-        >
-          <span className="text-base">+</span>
-          پروژه جدید
-        </Link>
+        <div className="flex items-center gap-2">
+          {/* دکمه مدیریت تکنولوژی‌ها */}
+          <TechnologiesManagerPanel />
+          {/* دکمه پروژه جدید */}
+          <Link
+            href={`/${locale}/admin/portfolio/new`}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium transition-all duration-200 shadow-[0_0_20px_rgba(147,51,234,0.25)] hover:shadow-[0_0_25px_rgba(147,51,234,0.45)]"
+          >
+            <span className="text-base leading-none">+</span>
+            پروژه جدید
+          </Link>
+        </div>
       </div>
 
-      {/* ─── Table ─────────────────────────────────────────────────────────── */}
+      {/* ─── Table ──────────────────────────────────────────────────────── */}
       <div className="rounded-2xl border border-white/5 overflow-hidden bg-[#0d0d12]/60 backdrop-blur-xl">
         {projects.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 gap-3">

@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -28,7 +29,10 @@ function isValidUrl(str: string): boolean {
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
 // ─── Data fetching ────────────────────────────────────────────────────────────
-async function getProject(slug: string, locale: string) {
+// cache() deduplicates this call: generateMetadata + page both call it,
+// but the DB is hit only ONCE per request.
+const getProject = cache(async (slug: string, locale: string) => {
+  // Round 1: get project by slug (need id first)
   const [project] = await db
     .select()
     .from(portfolioProjects)
@@ -37,53 +41,62 @@ async function getProject(slug: string, locale: string) {
 
   if (!project || project.status !== 'published') return null;
 
-  const [translation] = await db
-    .select()
-    .from(portfolioProjectTranslations)
-    .where(
-      and(
-        eq(portfolioProjectTranslations.projectId, project.id),
-        eq(portfolioProjectTranslations.locale, locale as 'fa' | 'en')
+  // Round 2: all dependent queries in parallel
+  const [
+    [translation],
+    [content],
+    images,
+    techRows,
+    links,
+  ] = await Promise.all([
+    db
+      .select()
+      .from(portfolioProjectTranslations)
+      .where(
+        and(
+          eq(portfolioProjectTranslations.projectId, project.id),
+          eq(portfolioProjectTranslations.locale, locale as 'fa' | 'en')
+        )
       )
-    )
-    .limit(1);
+      .limit(1),
+
+    db
+      .select()
+      .from(portfolioProjectContent)
+      .where(
+        and(
+          eq(portfolioProjectContent.projectId, project.id),
+          eq(portfolioProjectContent.locale, locale as 'fa' | 'en')
+        )
+      )
+      .limit(1),
+
+    db
+      .select()
+      .from(portfolioProjectImages)
+      .where(eq(portfolioProjectImages.projectId, project.id))
+      .orderBy(asc(portfolioProjectImages.sortOrder)),
+
+    db
+      .select({ name: portfolioTechnologies.name, icon: portfolioTechnologies.icon, slug: portfolioTechnologies.slug, website: portfolioTechnologies.website })
+      .from(portfolioProjectTechnologies)
+      .innerJoin(portfolioTechnologies, eq(portfolioProjectTechnologies.technologyId, portfolioTechnologies.id))
+      .where(eq(portfolioProjectTechnologies.projectId, project.id)),
+
+    db
+      .select()
+      .from(portfolioProjectLinks)
+      .where(eq(portfolioProjectLinks.projectId, project.id))
+      .orderBy(asc(portfolioProjectLinks.sortOrder)),
+  ]);
 
   if (!translation) return null;
-
-  const [content] = await db
-    .select()
-    .from(portfolioProjectContent)
-    .where(
-      and(
-        eq(portfolioProjectContent.projectId, project.id),
-        eq(portfolioProjectContent.locale, locale as 'fa' | 'en')
-      )
-    )
-    .limit(1);
-
-  const images = await db
-    .select()
-    .from(portfolioProjectImages)
-    .where(eq(portfolioProjectImages.projectId, project.id))
-    .orderBy(asc(portfolioProjectImages.sortOrder));
-
-  const techRows = await db
-    .select({ name: portfolioTechnologies.name, icon: portfolioTechnologies.icon, slug: portfolioTechnologies.slug })
-    .from(portfolioProjectTechnologies)
-    .innerJoin(portfolioTechnologies, eq(portfolioProjectTechnologies.technologyId, portfolioTechnologies.id))
-    .where(eq(portfolioProjectTechnologies.projectId, project.id));
-
-  const links = await db
-    .select()
-    .from(portfolioProjectLinks)
-    .where(eq(portfolioProjectLinks.projectId, project.id))
-    .orderBy(asc(portfolioProjectLinks.sortOrder));
 
   const primaryImage = images.find((img) => img.isPrimary === 1) ?? images[0] ?? null;
   const galleryImages = images.filter((img) => img.isPrimary !== 1);
 
   return { project, translation, content, primaryImage, galleryImages, techs: techRows, links };
-}
+});
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -141,7 +154,7 @@ export default async function PortfolioProjectPage({ params }: Props) {
   const data = await getProject(slug, locale);
   if (!data) notFound();
 
-  const { translation, content, primaryImage, galleryImages, techs, links } = data;
+  const { project, translation, content, primaryImage, galleryImages, techs, links } = data;
 
   const t = {
     backLabel:      isPersian ? '← نمونه کارها' : '← Portfolio',
@@ -188,6 +201,7 @@ export default async function PortfolioProjectPage({ params }: Props) {
                   alt={primaryImage.alt ?? translation.title}
                   fill
                   priority
+                  unoptimized
                   className="object-cover"
                   sizes="(max-width: 1200px) 100vw, 1200px"
                 />
@@ -212,6 +226,21 @@ export default async function PortfolioProjectPage({ params }: Props) {
             {translation.title}
           </h1>
           <p className="text-base text-gray-400 leading-relaxed max-w-2xl">{translation.brief}</p>
+          {/* آخرین به‌روزرسانی */}
+          {project.updatedAt && (
+            <p className="flex items-center gap-1.5 text-xs text-gray-600 pt-1">
+              <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {isPersian ? 'آخرین به‌روزرسانی:' : 'Last updated:'}{' '}
+              <time dateTime={new Date(project.updatedAt).toISOString()}>
+                {new Date(project.updatedAt).toLocaleDateString(
+                  isPersian ? 'fa-IR' : 'en-US',
+                  { year: 'numeric', month: 'long', day: 'numeric' }
+                )}
+              </time>
+            </p>
+          )}
         </div>
 
         <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-10" />
@@ -292,6 +321,7 @@ export default async function PortfolioProjectPage({ params }: Props) {
                   prose-img:rounded-xl prose-img:border prose-img:border-white/[0.07]
                   prose-hr:border-white/10
                   prose-li:text-gray-400"
+                suppressHydrationWarning
                 dangerouslySetInnerHTML={{ __html: content.contentHtml }}
               />
             ) : (
@@ -312,6 +342,7 @@ export default async function PortfolioProjectPage({ params }: Props) {
                           src={img.url}
                           alt={img.alt ?? translation.title}
                           fill
+                          unoptimized
                           className="object-cover"
                           sizes="(max-width: 768px) 100vw, 50vw"
                         />
@@ -351,15 +382,32 @@ export default async function PortfolioProjectPage({ params }: Props) {
                 <div className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-5 space-y-3">
                   <h3 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{t.techStack}</h3>
                   <div className="flex flex-wrap gap-2">
-                    {techs.map((tech) => (
-                      <span
-                        key={tech.slug}
-                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-300 bg-white/5 border border-white/[0.08] px-2.5 py-1 rounded-lg"
-                      >
-                        {tech.icon && <span className="text-sm">{tech.icon}</span>}
-                        {tech.name}
-                      </span>
-                    ))}
+                    {techs.map((tech) =>
+                      tech.website ? (
+                        <a
+                          key={tech.slug}
+                          href={tech.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-300 hover:text-purple-300 bg-white/5 hover:bg-purple-500/10 border border-white/[0.08] hover:border-purple-500/20 px-2.5 py-1 rounded-lg transition-colors"
+                        >
+                          {tech.icon && <span className="text-sm">{tech.icon}</span>}
+                          {tech.name}
+                          <svg xmlns="http://www.w3.org/2000/svg" className="w-2.5 h-2.5 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                            <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+                          </svg>
+                        </a>
+                      ) : (
+                        <span
+                          key={tech.slug}
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-300 bg-white/5 border border-white/[0.08] px-2.5 py-1 rounded-lg"
+                        >
+                          {tech.icon && <span className="text-sm">{tech.icon}</span>}
+                          {tech.name}
+                        </span>
+                      )
+                    )}
                   </div>
                 </div>
               )}

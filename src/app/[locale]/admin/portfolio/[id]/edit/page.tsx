@@ -9,9 +9,26 @@ import {
 } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { notFound } from 'next/navigation';
+import { getTechnologies } from '@/actions/admin-portfolio';
 import ProjectForm from '@/components/admin/portfolio/ProjectForm';
 import ProjectImagesManager from '@/components/admin/portfolio/ProjectImagesManager';
 import type { ProjectFormData, ProjectImage } from '@/actions/admin-portfolio';
+
+// ─── Retry برای Supabase free tier ────────────────────────────────────────────
+// وقتی Supabase بخوابه، اولین query با کد 57014 کنسل میشه.
+// هر query جداگانه داخل dbRetry — تا unhandledRejection نداشته باشیم
+async function dbRetry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await fn();
+    } catch (err: unknown) {
+      const code = (err as any)?.code ?? (err as any)?.cause?.code;
+      if (code !== '57014' || i === attempts - 1) throw err;
+      await new Promise<void>((r) => setTimeout(r, 800 * (i + 1)));
+    }
+  }
+  throw new Error('unreachable');
+}
 
 export default async function EditPortfolioProjectPage({
   params,
@@ -21,51 +38,38 @@ export default async function EditPortfolioProjectPage({
   const resolvedParams = await params;
   const { locale, id } = resolvedParams;
 
-  // فچ پروژه
-  const [project] = await db
-    .select()
-    .from(portfolioProjects)
-    .where(eq(portfolioProjects.id, id))
-    .limit(1);
+  // فچ موازی — هر query جداگانه داخل dbRetry تا unhandledRejection نداشته باشیم
+  const [projectRows, translations, contents, links, techs, images, allTechnologies] = await Promise.all([
+    dbRetry(() =>
+      db.select().from(portfolioProjects).where(eq(portfolioProjects.id, id)).limit(1)
+    ),
+    dbRetry(() =>
+      db.select().from(portfolioProjectTranslations).where(eq(portfolioProjectTranslations.projectId, id))
+    ),
+    dbRetry(() =>
+      db.select().from(portfolioProjectContent).where(eq(portfolioProjectContent.projectId, id))
+    ),
+    dbRetry(() =>
+      db.select().from(portfolioProjectLinks).where(eq(portfolioProjectLinks.projectId, id))
+    ),
+    dbRetry(() =>
+      db.select().from(portfolioProjectTechnologies).where(eq(portfolioProjectTechnologies.projectId, id))
+    ),
+    dbRetry(() =>
+      db.select().from(portfolioProjectImages)
+        .where(eq(portfolioProjectImages.projectId, id))
+        .orderBy(portfolioProjectImages.sortOrder)
+    ),
+    dbRetry(() => getTechnologies()),
+  ]);
 
+  const project = projectRows[0];
   if (!project) notFound();
-
-  // فچ ترجمه‌ها
-  const translations = await db
-    .select()
-    .from(portfolioProjectTranslations)
-    .where(eq(portfolioProjectTranslations.projectId, id));
 
   const fa = translations.find(t => t.locale === 'fa');
   const en = translations.find(t => t.locale === 'en');
-
-  // فچ HTML content
-  const contents = await db
-    .select()
-    .from(portfolioProjectContent)
-    .where(eq(portfolioProjectContent.projectId, id));
-
   const faContent = contents.find(c => c.locale === 'fa');
   const enContent = contents.find(c => c.locale === 'en');
-
-  // فچ لینک‌ها
-  const links = await db
-    .select()
-    .from(portfolioProjectLinks)
-    .where(eq(portfolioProjectLinks.projectId, id));
-
-  // فچ تکنولوژی‌ها
-  const techs = await db
-    .select()
-    .from(portfolioProjectTechnologies)
-    .where(eq(portfolioProjectTechnologies.projectId, id));
-
-  // فچ تصاویر
-  const images = await db
-    .select()
-    .from(portfolioProjectImages)
-    .where(eq(portfolioProjectImages.projectId, id))
-    .orderBy(portfolioProjectImages.sortOrder);
 
   const initialData: Partial<ProjectFormData> & { id: string } = {
     id,
@@ -82,7 +86,9 @@ export default async function EditPortfolioProjectPage({
     fa_challengeTitle: fa?.challengeTitle ?? '',
     fa_challengeText: fa?.challengeText ?? '',
     fa_solutionTitle: fa?.solutionTitle ?? '',
+    fa_solutionSteps: fa?.solutionSteps ? JSON.stringify(fa.solutionSteps) : '[]',
     fa_resultsTitle: fa?.resultsTitle ?? '',
+    fa_resultsItems: fa?.resultsItems ? JSON.stringify(fa.resultsItems) : '[]',
     fa_techStackTitle: fa?.techStackTitle ?? '',
     en_title: en?.title ?? '',
     en_brief: en?.brief ?? '',
@@ -94,7 +100,9 @@ export default async function EditPortfolioProjectPage({
     en_challengeTitle: en?.challengeTitle ?? '',
     en_challengeText: en?.challengeText ?? '',
     en_solutionTitle: en?.solutionTitle ?? '',
+    en_solutionSteps: en?.solutionSteps ? JSON.stringify(en.solutionSteps) : '[]',
     en_resultsTitle: en?.resultsTitle ?? '',
+    en_resultsItems: en?.resultsItems ? JSON.stringify(en.resultsItems) : '[]',
     en_techStackTitle: en?.techStackTitle ?? '',
     fa_contentHtml: faContent?.contentHtml ?? '',
     en_contentHtml: enContent?.contentHtml ?? '',
@@ -118,7 +126,7 @@ export default async function EditPortfolioProjectPage({
       </div>
 
       {/* فرم اصلی محتوا */}
-      <ProjectForm locale={locale} mode="edit" initialData={initialData} />
+      <ProjectForm locale={locale} mode="edit" initialData={initialData} availableTechnologies={allTechnologies} />
 
       {/* مدیریت تصاویر — جداگانه زیر فرم */}
       <div className="rounded-2xl border border-white/5 bg-[#0d0d12]/60 backdrop-blur-xl p-5 flex flex-col gap-4">

@@ -9,23 +9,26 @@ import {
   portfolioProjectTechnologies,
   portfolioTechnologies,
 } from '@/db/schema';
-import { eq, and, asc } from 'drizzle-orm';
-
-export const revalidate = 4600;
-export const dynamicParams = true;
+import { eq, inArray } from 'drizzle-orm';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://samankhoshnoud.ir';
 
-type Props = { params: Promise<{ locale: string }> };
+type Props = {
+  params: Promise<{ locale: string }>;
+};
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const isPersian = locale === 'fa';
 
-  const title = isPersian ? 'نمونه کارها | سامان خوشنود' : 'Portfolio | Saman Khoshnood';
+  const title = isPersian
+    ? 'نمونه کارها | سامان خوشنود'
+    : 'Portfolio | Saman Khoshnood';
+
   const description = isPersian
-    ? 'مجموعه‌ای از پروژه‌های وب، اپلیکیشن‌ها و ابزارهایی که طراحی و توسعه داده‌ام'
-    : 'A collection of web projects, applications and tools I have designed and developed';
+    ? 'مجموعه‌ای از پروژه‌های وب، اپلیکیشن‌ها و ابزارهایی که سامان خوشنود طراحی و توسعه داده است'
+    : 'A collection of web projects, applications, and tools designed and developed by Saman Khoshnood';
+
   const canonicalUrl = `${SITE_URL}/${locale}/portfolio`;
 
   return {
@@ -42,7 +45,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
     },
     openGraph: {
-      title, description, url: canonicalUrl,
+      title,
+      description,
+      url: canonicalUrl,
       siteName: isPersian ? 'وب‌سایت سامان خوشنود' : 'Saman Khoshnood',
       locale: isPersian ? 'fa_IR' : 'en_US',
       type: 'website',
@@ -51,90 +56,120 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-function isValidUrl(str: string): boolean {
-  try {
-    const url = new URL(str);
-    return url.protocol === 'http:' || url.protocol === 'https:';
-  } catch {
-    return false;
+// ─── DB fetch ────────────────────────────────────────────────────────────────
+async function getPublishedProjects(locale: string) {
+  // ۱. پروژه‌های منتشر شده + ترجمه‌ها — دو query موازی
+  const [allProjects, allTranslations] = await Promise.all([
+    db
+      .select({ id: portfolioProjects.id, slug: portfolioProjects.slug, sortOrder: portfolioProjects.sortOrder })
+      .from(portfolioProjects)
+      .where(eq(portfolioProjects.status, 'published'))
+      .orderBy(portfolioProjects.sortOrder),
+    db
+      .select({
+        projectId: portfolioProjectTranslations.projectId,
+        title: portfolioProjectTranslations.title,
+        brief: portfolioProjectTranslations.brief,
+        badge: portfolioProjectTranslations.badge,
+      })
+      .from(portfolioProjectTranslations)
+      .where(eq(portfolioProjectTranslations.locale, locale as 'fa' | 'en')),
+  ]);
+
+  if (allProjects.length === 0) return [];
+
+  const projectIds = allProjects.map((p) => p.id);
+
+  // ۲. تصاویر شاخص + تکنولوژی‌ها — دو query موازی
+  const [primaryImages, techRows] = await Promise.all([
+    db
+      .select({ projectId: portfolioProjectImages.projectId, url: portfolioProjectImages.url, alt: portfolioProjectImages.alt })
+      .from(portfolioProjectImages)
+      .where(
+        inArray(portfolioProjectImages.projectId, projectIds)
+      )
+      .orderBy(portfolioProjectImages.isPrimary),
+    db
+      .select({
+        projectId: portfolioProjectTechnologies.projectId,
+        name: portfolioTechnologies.name,
+        icon: portfolioTechnologies.icon,
+        slug: portfolioTechnologies.slug,
+        website: portfolioTechnologies.website,
+      })
+      .from(portfolioProjectTechnologies)
+      .innerJoin(portfolioTechnologies, eq(portfolioProjectTechnologies.technologyId, portfolioTechnologies.id))
+      .where(inArray(portfolioProjectTechnologies.projectId, projectIds)),
+  ]);
+
+  // ترکیب در حافظه
+  const translationMap = new Map(allTranslations.map((t) => [t.projectId, t]));
+  const imageMap = new Map<string, { url: string; alt: string | null }>();
+  for (const img of primaryImages) {
+    if (!imageMap.has(img.projectId)) imageMap.set(img.projectId, { url: img.url, alt: img.alt });
   }
-}
+  const techMap = new Map<string, { name: string; icon: string | null; slug: string; website: string | null }[]>();
+  for (const row of techRows) {
+    const arr = techMap.get(row.projectId) ?? [];
+    arr.push({ name: row.name, icon: row.icon, slug: row.slug, website: row.website });
+    techMap.set(row.projectId, arr);
+  }
 
-// ─── Data fetching ────────────────────────────────────────────────────────────
-async function getPortfolioProjects(locale: string) {
-  // پروژه‌های published، مرتب‌شده
-  const published = await db
-    .select({ id: portfolioProjects.id, slug: portfolioProjects.slug })
-    .from(portfolioProjects)
-    .where(eq(portfolioProjects.status, 'published'))
-    .orderBy(asc(portfolioProjects.sortOrder));
-
-  if (published.length === 0) return [];
-
-  const projectIds = published.map((p) => p.id);
-
-  // ترجمه‌ها
-  const translations = await db
-    .select()
-    .from(portfolioProjectTranslations)
-    .where(eq(portfolioProjectTranslations.locale, locale as 'fa' | 'en'));
-
-  // تصویر اصلی هر پروژه (is_primary در Supabase integer است: 1 = primary)
-  const images = await db
-    .select()
-    .from(portfolioProjectImages)
-    .where(eq(portfolioProjectImages.isPrimary, 1));
-
-  // تکنولوژی‌ها
-  const techLinks = await db
-    .select({
-      projectId: portfolioProjectTechnologies.projectId,
-      name: portfolioTechnologies.name,
-      icon: portfolioTechnologies.icon,
+  return allProjects
+    .map((p) => {
+      const tr = translationMap.get(p.id);
+      if (!tr) return null;
+      return {
+        id: p.id,
+        slug: p.slug,
+        sortOrder: p.sortOrder,
+        title: tr.title,
+        brief: tr.brief,
+        badge: tr.badge ?? null,
+        image: imageMap.get(p.id) ?? null,
+        techs: (techMap.get(p.id) ?? []).slice(0, 4),
+      };
     })
-    .from(portfolioProjectTechnologies)
-    .innerJoin(
-      portfolioTechnologies,
-      eq(portfolioProjectTechnologies.technologyId, portfolioTechnologies.id)
-    );
-
-  // ترکیب داده‌ها
-  return published.map((project) => {
-    const translation = translations.find((t) => t.projectId === project.id);
-    const image = images.find((img) => img.projectId === project.id);
-    const techs = techLinks.filter((t) => t.projectId === project.id);
-    return { ...project, translation, image, techs };
-  }).filter((p) => p.translation); // فقط پروژه‌هایی که ترجمه دارن
+    .filter(Boolean) as NonNullable<ReturnType<typeof Array.prototype.map>[number]>[];
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+function isValidUrl(str: string) {
+  try {
+    const u = new URL(str);
+    return u.protocol === 'http:' || u.protocol === 'https:';
+  } catch { return false; }
+}
+
+// ─── Page ────────────────────────────────────────────────────────────────────
 export default async function PortfolioPage({ params }: Props) {
   const { locale } = await params;
   const isRTL = locale === 'fa';
   const isPersian = locale === 'fa';
 
-  const projects = await getPortfolioProjects(locale);
+  const dbProjects = await getPublishedProjects(locale);
 
   const t = {
-    badge: isPersian ? 'نمونه کارها' : 'Portfolio',
-    heroTitle: isPersian ? 'پروژه‌هایی که ساختم' : "Projects I've Built",
-    heroSub: isPersian
-      ? 'مجموعه‌ای از پروژه‌های واقعی که در طول مسیرم توسعه دادم'
-      : 'A collection of real-world projects developed along my journey',
-    empty: isPersian ? 'هنوز پروژه‌ای منتشر نشده' : 'No projects published yet',
-    viewProject: isPersian ? 'مشاهده پروژه' : 'View Project',
-    ctaTitle: isPersian ? 'می‌خوای با هم یه پروژه بسازیم؟' : 'Want to build something together?',
-    ctaDesc: isPersian
+    badge:      isPersian ? 'نمونه کارها' : 'Portfolio',
+    heroTitle:  isPersian ? 'پروژه‌هایی که ساختم' : "Projects I've Built",
+    heroSubtitle: isPersian
+      ? 'مجموعه‌ای از پروژه‌های واقعی، آزمایشگاهی و متن‌باز که در طول مسیرم توسعه دادم'
+      : 'A collection of real-world, experimental, and open-source projects developed along my journey',
+    viewProject: isPersian ? 'مشاهده جزئیات' : 'View Project',
+    empty:      isPersian ? 'به زودی پروژه‌ها اینجا قرار می‌گیرند' : 'Projects coming soon',
+    ctaTitle:   isPersian ? 'می‌خوای با هم یه پروژه بسازیم؟' : 'Want to build something together?',
+    ctaDesc:    isPersian
       ? 'اگه ایده‌ای داری که می‌خوای به واقعیت تبدیل بشه، بیا با هم صحبت کنیم.'
       : "If you have an idea you want turned into reality, let's talk.",
-    ctaContact: isPersian ? 'تماس با من' : 'Contact Me',
+    ctaContact:  isPersian ? 'تماس با من' : 'Contact Me',
     ctaServices: isPersian ? 'مشاهده خدمات' : 'View Services',
   };
 
   return (
-    <div className="min-h-screen bg-[#0d0d12] text-white overflow-x-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24 space-y-16">
+    <div
+      className="min-h-screen bg-[#0d0d12] text-white overflow-x-hidden"
+      dir={isRTL ? 'rtl' : 'ltr'}
+    >
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24 space-y-16">
 
         {/* ── Badge ─────────────────────────────────────────── */}
         <div className="flex items-center justify-start">
@@ -149,86 +184,107 @@ export default async function PortfolioPage({ params }: Props) {
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent">
             {t.heroTitle}
           </h1>
-          <p className="text-sm md:text-base text-gray-400 leading-relaxed max-w-2xl">{t.heroSub}</p>
+          <p className="text-sm md:text-base text-gray-400 leading-relaxed max-w-2xl font-medium">
+            {t.heroSubtitle}
+          </p>
         </section>
 
         <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
-        {/* ── Projects Grid ─────────────────────────────────── */}
-        {projects.length === 0 ? (
-          <div className="text-center py-20 text-gray-500">{t.empty}</div>
+        {/* ── Projects grid ─────────────────────────────────── */}
+        {dbProjects.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 gap-3 text-gray-600">
+            <span className="text-5xl">🗂️</span>
+            <p className="text-sm">{t.empty}</p>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projects.map((project) => (
-              <Link
-                key={project.id}
-                href={`/${locale}/portfolio/${project.slug}`}
-                className="group relative flex flex-col bg-white/[0.03] border border-white/[0.07] rounded-2xl overflow-hidden hover:border-purple-500/30 hover:bg-white/[0.05] transition-all duration-300"
-              >
-                {/* ── تصویر ────────────────────────────────── */}
-                <div className="relative w-full aspect-video bg-white/[0.03] overflow-hidden">
-                  {project.image?.url && isValidUrl(project.image.url) ? (
-                    <Image
-                      src={project.image.url}
-                      alt={project.image.alt ?? project.translation!.title}
-                      fill
-                      className="object-cover group-hover:scale-[1.03] transition-transform duration-500"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-5xl">
-                      {project.image?.url && !isValidUrl(project.image.url) ? project.image.url : '🖼️'}
-                    </div>
-                  )}
-                  {/* Overlay gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0d0d12]/80 via-transparent to-transparent" />
+          <section>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {dbProjects.map((project) => (
+                <div
+                  key={project.id}
+                  className="group relative flex flex-col bg-white/[0.03] border border-white/[0.07] hover:border-purple-500/30 rounded-2xl overflow-hidden transition-all duration-300 hover:bg-white/[0.05]"
+                >
+                  {/* لینک کل کارت — z-10 روی همه محتوا، tech linkها z-20 */}
+                  <Link
+                    href={`/${locale}/portfolio/${project.slug}`}
+                    className="absolute inset-0 z-10 rounded-2xl"
+                    aria-label={project.title}
+                  />
+                  {/* Top gradient bar */}
+                  <div className="h-1 bg-gradient-to-r from-purple-600 via-violet-500 to-indigo-500 opacity-50 group-hover:opacity-90 transition-opacity" />
 
-                  {/* Badge */}
-                  {project.translation?.badge && (
-                    <span className="absolute top-3 start-3 text-[10px] font-bold bg-purple-500/80 text-white px-2.5 py-1 rounded-full backdrop-blur-sm">
-                      {project.translation.badge}
-                    </span>
-                  )}
-                </div>
-
-                {/* ── محتوا ────────────────────────────────── */}
-                <div className="flex flex-col flex-1 p-5 gap-3">
-                  <h2 className="text-base font-bold text-white group-hover:text-purple-200 transition-colors leading-snug">
-                    {project.translation!.title}
-                  </h2>
-                  <p className="text-sm text-gray-400 leading-relaxed line-clamp-2">
-                    {project.translation!.brief}
-                  </p>
-
-                  {/* تکنولوژی‌ها */}
-                  {project.techs.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-auto pt-2">
-                      {project.techs.slice(0, 4).map((tech) => (
-                        <span
-                          key={tech.name}
-                          className="inline-flex items-center gap-1 text-[10px] font-semibold text-gray-400 bg-white/5 border border-white/[0.08] px-2 py-0.5 rounded-md"
-                        >
-                          {tech.icon && <span>{tech.icon}</span>}
-                          {tech.name}
-                        </span>
-                      ))}
-                      {project.techs.length > 4 && (
-                        <span className="text-[10px] text-gray-500">+{project.techs.length - 4}</span>
-                      )}
+                  {/* Image thumbnail (if exists) */}
+                  {project.image && isValidUrl(project.image.url) && (
+                    <div className="relative w-full aspect-video overflow-hidden bg-white/[0.03]">
+                      <Image
+                        src={project.image.url}
+                        alt={project.image.alt ?? project.title}
+                        fill
+                        unoptimized
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0d0d12]/70 via-transparent to-transparent" />
                     </div>
                   )}
 
-                  {/* Arrow */}
-                  <div className="flex items-center gap-1.5 text-xs text-purple-400 font-semibold mt-2 group-hover:gap-2.5 transition-all">
-                    {t.viewProject}
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d={isRTL ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7'} />
-                    </svg>
+                  <div className="flex flex-col flex-1 p-5 gap-3">
+                    {/* Badge */}
+                    {project.badge && (
+                      <span className="inline-block self-start text-[10px] font-bold text-purple-400 bg-purple-500/10 border border-purple-500/20 px-2.5 py-0.5 rounded-full">
+                        {project.badge}
+                      </span>
+                    )}
+
+                    {/* Title + brief */}
+                    <div className="space-y-1.5 flex-1">
+                      <h2 className="text-base font-bold text-white leading-snug group-hover:text-purple-200 transition-colors">
+                        {project.title}
+                      </h2>
+                      <p className="text-sm text-gray-400 leading-relaxed line-clamp-2">{project.brief}</p>
+                    </div>
+
+                    {/* Tech tags */}
+                    {project.techs.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mt-auto pt-1">
+                        {project.techs.map((tech) =>
+                          tech.website ? (
+                            <a
+                              key={tech.slug}
+                              href={tech.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="relative z-20 inline-flex items-center gap-1 text-[10px] font-semibold text-gray-400 hover:text-purple-300 bg-white/5 hover:bg-purple-500/10 border border-white/[0.08] hover:border-purple-500/20 px-2 py-0.5 rounded-md transition-colors"
+                            >
+                              {tech.icon && <span className="text-xs">{tech.icon}</span>}
+                              {tech.name}
+                            </a>
+                          ) : (
+                            <span
+                              key={tech.slug}
+                              className="inline-flex items-center gap-1 text-[10px] font-semibold text-gray-400 bg-white/5 border border-white/[0.08] px-2 py-0.5 rounded-md"
+                            >
+                              {tech.icon && <span className="text-xs">{tech.icon}</span>}
+                              {tech.name}
+                            </span>
+                          )
+                        )}
+                      </div>
+                    )}
+
+                    {/* View arrow */}
+                    <div className="flex items-center gap-1 text-xs font-semibold text-gray-500 group-hover:text-purple-400 transition-colors mt-1">
+                      <span>{t.viewProject}</span>
+                      <svg className="w-3 h-3 transition-transform group-hover:translate-x-0.5 rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
                   </div>
                 </div>
-              </Link>
-            ))}
-          </div>
+              ))}
+            </div>
+          </section>
         )}
 
         <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />

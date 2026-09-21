@@ -1,3 +1,4 @@
+import { getTechnologies } from '@/actions/admin-portfolio';
 import ProjectForm from '@/components/admin/portfolio/ProjectForm';
 
 export default async function NewPortfolioProjectPage({
@@ -7,6 +8,7 @@ export default async function NewPortfolioProjectPage({
 }) {
   const resolvedParams = await params;
   const locale = resolvedParams.locale;
+  const technologies = await getTechnologies();
 
   return (
     <div className="flex flex-col gap-6" dir="rtl">
@@ -14,7 +16,7 @@ export default async function NewPortfolioProjectPage({
         <h1 className="text-2xl font-bold text-white">پروژه جدید</h1>
         <p className="text-sm text-gray-500 mt-0.5">اطلاعات پروژه را وارد کنید</p>
       </div>
-      <ProjectForm locale={locale} mode="create" />
+      <ProjectForm locale={locale} mode="create" availableTechnologies={technologies} />
     </div>
   );
 }

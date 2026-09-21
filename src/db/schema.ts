@@ -204,6 +204,7 @@ export const portfolioTechnologies = pgTable('portfolio_technologies', {
   name:      text('name').notNull(),
   slug:      text('slug').notNull().unique(),
   icon:      text('icon'),
+  website:   text('website'), // آدرس سایت رسمی — برای لینک‌دهی در صفحات public
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
