@@ -56,8 +56,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+// ─── Types ───────────────────────────────────────────────────────────────────
+type ProjectItem = {
+  id: string;
+  slug: string;
+  sortOrder: number | null;
+  title: string;
+  brief: string | null;
+  badge: string | null;
+  image: { url: string; alt: string | null } | null;
+  techs: { name: string; icon: string | null; slug: string; website: string | null }[];
+};
+
 // ─── DB fetch ────────────────────────────────────────────────────────────────
-async function getPublishedProjects(locale: string) {
+async function getPublishedProjects(locale: string): Promise<ProjectItem[]> {
   // ۱. پروژه‌های منتشر شده + ترجمه‌ها — دو query موازی
   const [allProjects, allTranslations] = await Promise.all([
     db
@@ -116,7 +128,7 @@ async function getPublishedProjects(locale: string) {
   }
 
   return allProjects
-    .map((p) => {
+    .map((p): ProjectItem | null => {
       const tr = translationMap.get(p.id);
       if (!tr) return null;
       return {
@@ -130,7 +142,7 @@ async function getPublishedProjects(locale: string) {
         techs: (techMap.get(p.id) ?? []).slice(0, 4),
       };
     })
-    .filter(Boolean) as NonNullable<ReturnType<typeof Array.prototype.map>[number]>[];
+    .filter((item): item is ProjectItem => item !== null);
 }
 
 function isValidUrl(str: string) {
