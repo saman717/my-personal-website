@@ -34,12 +34,12 @@ function bufToBase64url(buf: ArrayBuffer): string {
   return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
 
-/** تبدیل base64url به Uint8Array — بدون Buffer */
-function base64urlToUint8(b64url: string): Uint8Array {
+/** تبدیل base64url به Uint8Array<ArrayBuffer> — بدون Buffer */
+function base64urlToUint8(b64url: string): Uint8Array<ArrayBuffer> {
   const b64 = b64url.replace(/-/g, '+').replace(/_/g, '/');
   const padded = b64 + '='.repeat((4 - (b64.length % 4)) % 4);
   const str = atob(padded);
-  const bytes = new Uint8Array(str.length);
+  const bytes = new Uint8Array(new ArrayBuffer(str.length));
   for (let i = 0; i < str.length; i++) bytes[i] = str.charCodeAt(i);
   return bytes;
 }
