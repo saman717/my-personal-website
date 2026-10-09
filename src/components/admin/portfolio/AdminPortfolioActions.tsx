@@ -3,17 +3,25 @@
 import React, { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { deleteProject, toggleProjectStatus } from '@/actions/admin-portfolio';
-import { useRouter } from 'next/navigation';
 
 interface Props {
   projectId: string;
   projectSlug: string;
   currentStatus: 'draft' | 'published' | 'archived';
   locale: string;
+  // کال‌بک‌های والد — به‌جای router.refresh، state محلی رو آپدیت می‌کنن
+  onDeleted?: () => void;
+  onStatusChanged?: (status: 'draft' | 'published' | 'archived') => void;
 }
 
-export default function AdminPortfolioActions({ projectId, projectSlug, currentStatus, locale }: Props) {
-  const router = useRouter();
+export default function AdminPortfolioActions({
+  projectId,
+  projectSlug,
+  currentStatus,
+  locale,
+  onDeleted,
+  onStatusChanged,
+}: Props) {
   const [isPending, startTransition] = useTransition();
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -23,7 +31,8 @@ export default function AdminPortfolioActions({ projectId, projectSlug, currentS
   function handleToggleStatus() {
     startTransition(async () => {
       await toggleProjectStatus(projectId, nextStatus);
-      router.refresh();
+      // آپدیت state والد — بدون router.refresh
+      onStatusChanged?.(nextStatus as 'draft' | 'published' | 'archived');
     });
   }
 
@@ -31,7 +40,8 @@ export default function AdminPortfolioActions({ projectId, projectSlug, currentS
     startTransition(async () => {
       await deleteProject(projectId);
       setShowConfirm(false);
-      router.refresh();
+      // حذف ردیف از state والد — بدون router.refresh و بدون 42 ثانیه انتظار
+      onDeleted?.();
     });
   }
 
@@ -91,12 +101,17 @@ export default function AdminPortfolioActions({ projectId, projectSlug, currentS
             disabled={isPending}
             className="text-xs text-red-400 hover:text-red-300 font-medium disabled:opacity-40"
           >
-            بله
+            {isPending ? (
+              <span className="flex items-center gap-1">
+                <span className="w-3 h-3 border border-red-400/30 border-t-red-400 rounded-full animate-spin inline-block" />
+              </span>
+            ) : 'بله'}
           </button>
           <span className="text-red-500/30">|</span>
           <button
             onClick={() => setShowConfirm(false)}
-            className="text-xs text-gray-500 hover:text-gray-300"
+            disabled={isPending}
+            className="text-xs text-gray-500 hover:text-gray-300 disabled:opacity-40"
           >
             خیر
           </button>

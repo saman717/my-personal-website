@@ -1,36 +1,24 @@
-import { db } from '@/db';
+import { db, dbRetry } from '@/db';
 import { portfolioProjects, portfolioProjectTranslations } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import Link from 'next/link';
-import AdminPortfolioActions from '@/components/admin/portfolio/AdminPortfolioActions';
 import TechnologiesManagerPanel from '@/components/admin/portfolio/TechnologiesManagerPanel';
-
-// ─── Retry برای Supabase free tier ────────────────────────────────────────────
-// وقتی Supabase دیتابیس رو بخوابونه، اولین query با کد 57014 کنسل میشه.
-// این helper تا ۳ بار تلاش می‌کنه — بین هر بار کمی صبر می‌کنه تا DB بیدار بشه.
-async function dbRetry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
-  for (let i = 0; i < attempts; i++) {
-    try {
-      return await fn();
-    } catch (err: unknown) {
-      const code = (err as any)?.code ?? (err as any)?.cause?.code;
-      if (code !== '57014' || i === attempts - 1) throw err;
-      await new Promise<void>((r) => setTimeout(r, 800 * (i + 1)));
-    }
-  }
-  throw new Error('unreachable');
-}
+import PortfolioList from '@/components/admin/portfolio/PortfolioList';
+import type { ProjectRow } from '@/components/admin/portfolio/PortfolioList';
 
 export default async function AdminPortfolioPage({
   params,
 }: {
   params: Promise<{ locale: string }> | { locale: string };
 }) {
+  const isDev = process.env.NODE_ENV === 'development';
+  const t0 = Date.now();
+
   const resolvedParams = await params;
   const locale = resolvedParams.locale;
 
-  // ─── هر query جداگانه داخل dbRetry — تا unhandledRejection نداشته باشیم ────
-  // اگه Promise.all رو wrap کنیم، query دوم بعد از reject اولی بدون listener میمونه
+  const tQuery = Date.now();
+
   const [allProjects, faTranslations] = await Promise.all([
     dbRetry(() =>
       db
@@ -55,35 +43,45 @@ export default async function AdminPortfolioPage({
     ),
   ]);
 
-  // ترکیب در حافظه — بدون JOIN در SQL
+  const queryMs = Date.now() - tQuery;
+
+  if (isDev) {
+    console.log(
+      `[portfolio] DB queries: ${queryMs}ms | projects: ${allProjects.length} | translations: ${faTranslations.length}`
+    );
+  }
+
   const titleMap = new Map(faTranslations.map(t => [t.projectId, t.title]));
-  const projects = allProjects.map(p => ({ ...p, title: titleMap.get(p.id) ?? null }));
 
-  const statusColors: Record<string, string> = {
-    published: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-    draft:     'bg-yellow-500/10  text-yellow-400  border-yellow-500/20',
-    archived:  'bg-gray-500/10   text-gray-400    border-gray-500/20',
-  };
+  const projects: ProjectRow[] = allProjects.map(p => ({
+    id: p.id,
+    slug: p.slug,
+    status: p.status,
+    sortOrder: p.sortOrder,
+    title: titleMap.get(p.id) ?? null,
+    updatedAtFormatted: p.updatedAt
+      ? new Date(p.updatedAt).toLocaleDateString('fa-IR', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        })
+      : null,
+  }));
 
-  const statusLabels: Record<string, string> = {
-    published: 'منتشر شده',
-    draft:     'پیش‌نویس',
-    archived:  'بایگانی',
-  };
+  if (isDev) {
+    console.log(`[portfolio] total render prep: ${Date.now() - t0}ms`);
+  }
 
   return (
     <div className="flex flex-col gap-6" dir="rtl">
 
-      {/* ─── Header ─────────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">نمونه کارها</h1>
           <p className="text-sm text-gray-500 mt-0.5">{projects.length} پروژه در دیتابیس</p>
         </div>
         <div className="flex items-center gap-2">
-          {/* دکمه مدیریت تکنولوژی‌ها */}
           <TechnologiesManagerPanel />
-          {/* دکمه پروژه جدید */}
           <Link
             href={`/${locale}/admin/portfolio/new`}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium transition-all duration-200 shadow-[0_0_20px_rgba(147,51,234,0.25)] hover:shadow-[0_0_25px_rgba(147,51,234,0.45)]"
@@ -94,74 +92,10 @@ export default async function AdminPortfolioPage({
         </div>
       </div>
 
-      {/* ─── Table ──────────────────────────────────────────────────────── */}
       <div className="rounded-2xl border border-white/5 overflow-hidden bg-[#0d0d12]/60 backdrop-blur-xl">
-        {projects.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3">
-            <span className="text-5xl">🗂️</span>
-            <p className="text-gray-500 text-sm">هنوز هیچ پروژه‌ای ثبت نشده</p>
-            <Link
-              href={`/${locale}/admin/portfolio/new`}
-              className="mt-2 text-purple-400 text-sm hover:text-purple-300 underline underline-offset-4"
-            >
-              اولین پروژه را اضافه کن
-            </Link>
-          </div>
-        ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-white/5 text-gray-500 text-xs uppercase tracking-wider">
-                <th className="px-5 py-3.5 text-right font-medium">ردیف</th>
-                <th className="px-5 py-3.5 text-right font-medium">عنوان</th>
-                <th className="px-5 py-3.5 text-right font-medium">Slug</th>
-                <th className="px-5 py-3.5 text-right font-medium">وضعیت</th>
-                <th className="px-5 py-3.5 text-right font-medium">آخرین ویرایش</th>
-                <th className="px-5 py-3.5 text-right font-medium">عملیات</th>
-              </tr>
-            </thead>
-            <tbody>
-              {projects.map((p, idx) => (
-                <tr
-                  key={p.id}
-                  className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors"
-                >
-                  <td className="px-5 py-4 text-gray-600 w-10">{p.sortOrder ?? idx + 1}</td>
-                  <td className="px-5 py-4">
-                    <span className="text-gray-200 font-medium">{p.title ?? '—'}</span>
-                  </td>
-                  <td className="px-5 py-4">
-                    <code className="text-xs text-purple-400 bg-purple-500/5 px-2 py-0.5 rounded-md border border-purple-500/10">
-                      {p.slug}
-                    </code>
-                  </td>
-                  <td className="px-5 py-4">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${statusColors[p.status] ?? statusColors.draft}`}
-                    >
-                      {statusLabels[p.status] ?? p.status}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 text-gray-500 text-xs">
-                    {p.updatedAt
-                      ? new Date(p.updatedAt).toLocaleDateString('fa-IR', {
-                          year: 'numeric', month: 'short', day: 'numeric',
-                        })
-                      : '—'}
-                  </td>
-                  <td className="px-5 py-4">
-                    <AdminPortfolioActions
-                      projectId={p.id}
-                      projectSlug={p.slug}
-                      currentStatus={p.status as 'draft' | 'published' | 'archived'}
-                      locale={locale}
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+        <PortfolioList initialProjects={projects} locale={locale} />
       </div>
+
     </div>
   );
 }

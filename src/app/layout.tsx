@@ -13,14 +13,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://samankhoshnoud.ir'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  alternates: {
-    canonical: SITE_URL,
-    languages: {
-      'fa-IR': `${SITE_URL}/fa`,
-      'en-US': `${SITE_URL}/en`,
-      'x-default': `${SITE_URL}/fa`,
-    },
-  },
+  // بخش alternates کاملا پاک شد تا داینامیک هندل شود
   openGraph: {
     images: [
       {

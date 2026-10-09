@@ -1,20 +1,19 @@
 'use server';
 
-import { db } from '../db/index';
+import { db, dbRetry } from '../db/index';
 import { contactMessages } from '@/db/schema';
 import { desc, eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 
 // ۱. دریافت تمام پیام‌ها به ترتیب جدیدترین
 export async function getContactMessages() {
-  console.time("DB_FETCH_TIME");
   try {
-    const messages = await db
-      .select()
-      .from(contactMessages)
-      .orderBy(desc(contactMessages.createdAt));
-    
-    console.timeEnd("DB_FETCH_TIME");
+    const messages = await dbRetry(() =>
+      db
+        .select()
+        .from(contactMessages)
+        .orderBy(desc(contactMessages.createdAt))
+    );
     return { success: true, data: messages };
   } catch (error) {
     console.error('Fetch Error:', error);
@@ -25,10 +24,12 @@ export async function getContactMessages() {
 // ۲. تغییر وضعیت خوانده شدن/نشدن پیام
 export async function toggleMessageReadStatus(id: string, currentStatus: boolean) {
   try {
-    await db
-      .update(contactMessages)
-      .set({ isRead: !currentStatus })
-      .where(eq(contactMessages.id, id));
+    await dbRetry(() =>
+      db
+        .update(contactMessages)
+        .set({ isRead: !currentStatus })
+        .where(eq(contactMessages.id, id))
+    );
 
     revalidatePath('/[locale]/admin/messages', 'page');
     return { success: true };
@@ -41,9 +42,11 @@ export async function toggleMessageReadStatus(id: string, currentStatus: boolean
 // ۳. حذف پیام از دیتابیس
 export async function deleteMessageFromDb(id: string) {
   try {
-    await db
-      .delete(contactMessages)
-      .where(eq(contactMessages.id, id));
+    await dbRetry(() =>
+      db
+        .delete(contactMessages)
+        .where(eq(contactMessages.id, id))
+    );
 
     revalidatePath('/[locale]/admin/messages', 'page');
     return { success: true };
@@ -56,11 +59,13 @@ export async function deleteMessageFromDb(id: string) {
 // ۴. دریافت تعداد محدودی از آخرین پیام‌ها (مثلاً برای داشبورد ادمین)
 export async function getRecentMessages(limit: number = 3) {
   try {
-    const messages = await db
-      .select()
-      .from(contactMessages)
-      .orderBy(desc(contactMessages.createdAt))
-      .limit(limit);
+    const messages = await dbRetry(() =>
+      db
+        .select()
+        .from(contactMessages)
+        .orderBy(desc(contactMessages.createdAt))
+        .limit(limit)
+    );
 
     return {
       success: true,
@@ -78,7 +83,9 @@ export async function getRecentMessages(limit: number = 3) {
 // ۵. دریافت آمار پیشرفته پیام‌ها (کل، خوانده‌نشده، امروز و هفته گذشته)
 export async function getMessagesStats() {
   try {
-    const messages = await db.select().from(contactMessages);
+    const messages = await dbRetry(() =>
+      db.select().from(contactMessages)
+    );
 
     const now = new Date();
 
