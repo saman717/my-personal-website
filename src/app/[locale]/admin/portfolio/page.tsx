@@ -6,14 +6,14 @@ import TechnologiesManagerPanel from '@/components/admin/portfolio/TechnologiesM
 import PortfolioList from '@/components/admin/portfolio/PortfolioList';
 import type { ProjectRow } from '@/components/admin/portfolio/PortfolioList';
 
+// همیشه server-side render شود — هیچ‌وقت در build prerender نشود
+export const dynamic = 'force-dynamic';
+
 export default async function AdminPortfolioPage({
   params,
 }: {
   params: Promise<{ locale: string }> | { locale: string };
 }) {
-  const isDev = process.env.NODE_ENV === 'development';
-  const t0 = Date.now();
-
   const resolvedParams = await params;
   const locale = resolvedParams.locale;
 
@@ -43,13 +43,10 @@ export default async function AdminPortfolioPage({
     ),
   ]);
 
-  const queryMs = Date.now() - tQuery;
-
-  if (isDev) {
-    console.log(
-      `[portfolio] DB queries: ${queryMs}ms | projects: ${allProjects.length} | translations: ${faTranslations.length}`
-    );
-  }
+  // در production هم لاگ شود تا در Vercel Logs قابل بررسی باشد
+  console.log(
+    `[portfolio] DB ${Date.now() - tQuery}ms | projects=${allProjects.length} | translations=${faTranslations.length}`
+  );
 
   const titleMap = new Map(faTranslations.map(t => [t.projectId, t.title]));
 
@@ -67,10 +64,6 @@ export default async function AdminPortfolioPage({
         })
       : null,
   }));
-
-  if (isDev) {
-    console.log(`[portfolio] total render prep: ${Date.now() - t0}ms`);
-  }
 
   return (
     <div className="flex flex-col gap-6" dir="rtl">

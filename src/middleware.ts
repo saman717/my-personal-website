@@ -15,11 +15,12 @@ export async function middleware(request: NextRequest) {
 
   if (pathnameIsMissingLocale) {
     const newUrl = new URL(`/${defaultLocale}${pathname}`, request.url);
-    return NextResponse.redirect(newUrl, 301);
+    // ⚠️ 307 نه 301 — مرورگر 301 را برای همیشه cache می‌کند و اگر یک‌بار
+    // ریدایرکت اشتباه بخورد، کاربر تا پاک‌کردن کل cache گیر می‌افتد.
+    return NextResponse.redirect(newUrl, 307);
   }
 
   // ─── ۲. Admin Auth Guard ─────────────────────────────────────────────────
-  // تشخیص مسیر ادمین
   const isAdminPath = locales.some((locale) =>
     pathname.startsWith(`/${locale}/admin`)
   );
@@ -34,17 +35,14 @@ export async function middleware(request: NextRequest) {
     const isAuthenticated = token ? await verifySessionToken(token) : false;
 
     if (!isLoginPage && !isAuthenticated) {
-      // بدون توکن معتبر → ریدایرکت به login
       const locale =
         locales.find((l) => pathname.startsWith(`/${l}/`)) ?? defaultLocale;
       const loginUrl = new URL(`/${locale}/admin/login`, request.url);
-      // نگه‌داشتن مسیر اصلی برای redirect بعد از login (اختیاری)
       loginUrl.searchParams.set('from', pathname);
       return NextResponse.redirect(loginUrl);
     }
 
     if (isLoginPage && isAuthenticated) {
-      // قبلاً لاگین شده → ریدایرکت به dashboard
       const locale =
         locales.find((l) => pathname.startsWith(`/${l}/`)) ?? defaultLocale;
       return NextResponse.redirect(new URL(`/${locale}/admin`, request.url));
@@ -56,6 +54,8 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    // کل _next مستثنی شود (نه فقط _next/static و _next/image) —
+    // وگرنه مسیرهایی مثل /_next/data/... ریدایرکت به /fa/_next/... می‌خورند و 404 می‌شوند.
+    '/((?!api|_next|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml)$).*)',
   ],
 };
