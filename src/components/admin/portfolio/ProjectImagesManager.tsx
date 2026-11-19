@@ -2,7 +2,7 @@
 
 import React, { useState, useTransition } from 'react';
 import Image from 'next/image';
-import { LuTrash2, LuStar, LuX, LuLoader2, LuPlus } from 'react-icons/lu';
+import { LuTrash2, LuStar, LuX, LuLoaderCircle, LuPlus } from 'react-icons/lu';
 import {
   addProjectImage,
   deleteProjectImage,
@@ -249,7 +249,7 @@ export default function ProjectImagesManager({ projectId, initialImages }: Props
             disabled={isPending || !newUrl.trim()}
             className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-purple-600/80 hover:bg-purple-600 text-white text-sm font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {isPending ? <LuLoader2 size={16} className="animate-spin" /> : <LuPlus size={16} />}
+            {isPending ? <LuLoaderCircle size={16} className="animate-spin" /> : <LuPlus size={16} />}
             افزودن تصویر
           </button>
         </div>

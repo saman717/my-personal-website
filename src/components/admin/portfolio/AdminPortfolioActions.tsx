@@ -2,7 +2,7 @@
 
 import React, { useState, useTransition } from 'react';
 import Link from 'next/link';
-import { LuExternalLink, LuPencil, LuMinusCircle, LuCheckCircle, LuTrash2 } from 'react-icons/lu';
+import { LuExternalLink, LuPencil, LuCircleMinus, LuCircleCheck, LuTrash2 } from 'react-icons/lu';
 import { deleteProject, toggleProjectStatus } from '@/actions/admin-portfolio';
 
 interface Props {
@@ -74,7 +74,7 @@ export default function AdminPortfolioActions({
         title={nextStatusLabel}
         className="p-1.5 rounded-lg text-gray-500 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors disabled:opacity-40"
       >
-        {currentStatus === 'published' ? <LuMinusCircle size={16} /> : <LuCheckCircle size={16} />}
+        {currentStatus === 'published' ? <LuCircleMinus size={16} /> : <LuCircleCheck size={16} />}
       </button>
 
       {/* دکمه حذف */}

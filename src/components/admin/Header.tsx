@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
-import { LuMenu, LuLogOut, LuLoader2 } from 'react-icons/lu';
+import { LuMenu, LuLogOut, LuLoaderCircle } from 'react-icons/lu';
 import { TimeDisplay } from "@/hooks/useTimeHeader";
 import LanguageSwitcher from "@/components/layout/Header/LanguageSwitcher";
 
@@ -63,7 +63,7 @@ export default function Header({ locale, onMenuToggle, labels }: HeaderProps) {
           title="خروج از پنل"
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-gray-500 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all disabled:opacity-40"
         >
-          {isPending ? <LuLoader2 size={14} className="animate-spin" /> : <LuLogOut size={14} />}
+          {isPending ? <LuLoaderCircle size={14} className="animate-spin" /> : <LuLogOut size={14} />}
           <span className="hidden sm:inline">خروج</span>
         </button>
 

@@ -2,7 +2,7 @@
 
 import React, { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { LuAlertCircle, LuCheck, LuPlus, LuLoader2 } from 'react-icons/lu';
+import { LuCircleAlert, LuCheck, LuPlus, LuLoaderCircle } from 'react-icons/lu';
 import { createProject, updateProject, createTechnology, type ProjectFormData } from '@/actions/admin-portfolio';
 
 interface TechOption {
@@ -83,7 +83,7 @@ function TextareaField({ label, name, value, onChange, placeholder, rows, dir, e
       />
       {error && (
         <p className="text-xs text-red-400 flex items-start gap-1.5 mt-0.5">
-          <LuAlertCircle size={14} className="shrink-0 mt-0.5" />
+          <LuCircleAlert size={14} className="shrink-0 mt-0.5" />
           {error}
         </p>
       )}
@@ -529,7 +529,7 @@ export default function ProjectForm({ locale, initialData, mode, availableTechno
       {/* ─── Error ──────────────────────────────────────────────────────── */}
       {error && (
         <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-sm text-red-400 flex items-start gap-2">
-          <LuAlertCircle size={16} className="shrink-0 mt-0.5" />
+          <LuCircleAlert size={16} className="shrink-0 mt-0.5" />
           {error}
         </div>
       )}
@@ -550,7 +550,7 @@ export default function ProjectForm({ locale, initialData, mode, availableTechno
         >
           {isPending ? (
             <span className="flex items-center gap-2">
-              <LuLoader2 size={16} className="animate-spin" />
+              <LuLoaderCircle size={16} className="animate-spin" />
               {mode === 'create' ? 'در حال ذخیره...' : 'در حال بروزرسانی...'}
             </span>
           ) : mode === 'create' ? 'ایجاد پروژه' : 'ذخیره تغییرات'}

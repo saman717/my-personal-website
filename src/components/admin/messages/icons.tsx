@@ -1,6 +1,6 @@
 import {
   LuSearch, LuCheck, LuCircle, LuMail, LuUser,
-  LuPhone, LuCalendar, LuX, LuLoader2,
+  LuPhone, LuCalendar, LuX, LuLoaderCircle,
 } from 'react-icons/lu';
 
 export const IconSearch   = () => <LuSearch   size={16} />;
@@ -11,4 +11,4 @@ export const IconUser     = () => <LuUser     size={16} />;
 export const IconPhone    = () => <LuPhone    size={16} />;
 export const IconCalendar = () => <LuCalendar size={16} />;
 export const IconX        = () => <LuX        size={16} />;
-export const IconLoader   = () => <LuLoader2  size={24} className="animate-spin" />;
+export const IconLoader   = () => <LuLoaderCircle  size={24} className="animate-spin" />;
