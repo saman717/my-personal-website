@@ -1,4 +1,5 @@
 import React from 'react';
+import { LuFlag, LuMonitor } from 'react-icons/lu';
 
 interface TimelineItemType {
   id: number;
@@ -34,7 +35,7 @@ const timelineData: TimelineItemType[] = [
     icon: (
       <div className="w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center border border-red-500/20">
         {/* آیکون پرچم تو - اینجا کدهای SVG یا تصویرش رو قرار بده */}
-        <span className="text-3xl">🚩</span>
+        <LuFlag size={30} style={{ color: '#ef4444' }} />
       </div>
     ),
   },
@@ -53,7 +54,7 @@ const timelineData: TimelineItemType[] = [
     yearY: 700,
     icon: (
       <div className="w-20 h-20 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-        <span className="text-3xl">💻</span> {/* آیکون لپ‌تاپ UI/UX */}
+        <LuMonitor size={30} style={{ color: '#60a5fa' }} />
       </div>
     ),
   },

@@ -2,6 +2,7 @@
 
 import React, { useState, useTransition } from 'react';
 import Image from 'next/image';
+import { LuTrash2, LuStar, LuX, LuLoader2, LuPlus } from 'react-icons/lu';
 import {
   addProjectImage,
   deleteProjectImage,
@@ -136,9 +137,7 @@ export default function ProjectImagesManager({ projectId, initialImages }: Props
               disabled={isPending}
               className="p-1.5 rounded-lg text-gray-600 hover:text-red-400 hover:bg-red-500/10 transition-colors shrink-0"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
-              </svg>
+              <LuTrash2 size={16} />
             </button>
           </div>
         </div>
@@ -165,9 +164,7 @@ export default function ProjectImagesManager({ projectId, initialImages }: Props
                       title="تعیین به عنوان شاخص"
                       className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition-colors"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                      </svg>
+                      <LuStar size={16} />
                     </button>
                     <button
                       onClick={() => handleDelete(img.id)}
@@ -175,9 +172,7 @@ export default function ProjectImagesManager({ projectId, initialImages }: Props
                       title="حذف"
                       className="p-1.5 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                      </svg>
+                      <LuX size={16} />
                     </button>
                   </div>
                 </div>
@@ -254,11 +249,7 @@ export default function ProjectImagesManager({ projectId, initialImages }: Props
             disabled={isPending || !newUrl.trim()}
             className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-purple-600/80 hover:bg-purple-600 text-white text-sm font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {isPending ? (
-              <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            )}
+            {isPending ? <LuLoader2 size={16} className="animate-spin" /> : <LuPlus size={16} />}
             افزودن تصویر
           </button>
         </div>

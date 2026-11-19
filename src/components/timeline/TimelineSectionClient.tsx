@@ -3,6 +3,7 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, MotionValue, useSpring } from 'framer-motion';
 import { geoPositions, GeoPositionItem } from '@/data/timelineData';
+import TechBadge from '@/components/Ui/TechBadge';
 
 interface RenderableTimelineItem extends GeoPositionItem {
   translatedYear: string;
@@ -20,13 +21,12 @@ const TimelineCard: React.FC<{ item: RenderableTimelineItem }> = ({ item }) => {
   return (
     <div className="bg-[#131318] border border-gray-800/60 rounded-2xl p-6 flex flex-col items-center text-center shadow-2xl h-full justify-between transition-all duration-300 hover:border-gray-700 w-full">
       <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-[#1c1c24] flex items-center justify-center border border-gray-800/40 relative">
-        <span className="text-3xl md:text-4xl">{item.icon}</span>
+        {(() => { const ItemIcon = item.icon; return <ItemIcon size={36} style={{ color: item.iconColor }} />; })()}
       </div>
       <h3 className="text-white font-bold text-xl md:text-2xl mb-2">{item.translatedTitle}</h3>
-      <p className="text-gray-400 text-xs md:text-sm [direction:ltr] mb-6 font-medium">{item.translatedTech}</p>
-      <div className="flex gap-2 md:gap-3 justify-center w-full">
-        {[1, 2, 3, 4].map((box) => (
-          <div key={box} className="w-10 h-10 md:w-12 md:h-12 border border-gray-800 rounded-xl bg-[#16161a]/80 shadow-inner" />
+      <div className="flex flex-wrap gap-2 justify-center mt-2 w-full" dir="ltr">
+        {item.techs.map((tech) => (
+          <TechBadge key={tech.name} {...tech} />
         ))}
       </div>
     </div>

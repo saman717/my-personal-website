@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { LuX } from 'react-icons/lu';
 import { motion, AnimatePresence } from "framer-motion";
 
 interface SidePanelProps {
@@ -31,7 +32,7 @@ export default function SidePanel({ isOpen, onClose, title, children }: SidePane
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-lg font-bold text-white">{title}</h2>
               <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-full transition-all text-gray-400 hover:text-white">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                <LuX size={20} />
               </button>
             </div>
             {children}

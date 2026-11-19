@@ -2,6 +2,7 @@
 
 import React, { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { LuAlertCircle, LuCheck, LuPlus, LuLoader2 } from 'react-icons/lu';
 import { createProject, updateProject, createTechnology, type ProjectFormData } from '@/actions/admin-portfolio';
 
 interface TechOption {
@@ -82,9 +83,7 @@ function TextareaField({ label, name, value, onChange, placeholder, rows, dir, e
       />
       {error && (
         <p className="text-xs text-red-400 flex items-start gap-1.5 mt-0.5">
-          <svg className="w-3.5 h-3.5 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-          </svg>
+          <LuAlertCircle size={14} className="shrink-0 mt-0.5" />
           {error}
         </p>
       )}
@@ -157,9 +156,7 @@ function TechnologySelector({
                 {tech.icon && <span>{tech.icon}</span>}
                 {tech.name}
                 {isSelected && (
-                  <svg className="w-3 h-3 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                    <polyline points="20 6 9 17 4 12"/>
-                  </svg>
+                  <LuCheck size={12} className="text-purple-400" strokeWidth={3} />
                 )}
               </button>
             );
@@ -178,9 +175,7 @@ function TechnologySelector({
           onClick={() => setShowAdd(true)}
           className="self-start inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-dashed border-white/15 text-xs text-gray-500 hover:text-gray-300 hover:border-purple-500/40 transition-all"
         >
-          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-          </svg>
+          <LuPlus size={14} />
           افزودن تکنولوژی جدید
         </button>
       ) : (
@@ -534,9 +529,7 @@ export default function ProjectForm({ locale, initialData, mode, availableTechno
       {/* ─── Error ──────────────────────────────────────────────────────── */}
       {error && (
         <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-sm text-red-400 flex items-start gap-2">
-          <svg className="w-4 h-4 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-          </svg>
+          <LuAlertCircle size={16} className="shrink-0 mt-0.5" />
           {error}
         </div>
       )}
@@ -557,10 +550,7 @@ export default function ProjectForm({ locale, initialData, mode, availableTechno
         >
           {isPending ? (
             <span className="flex items-center gap-2">
-              <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-              </svg>
+              <LuLoader2 size={16} className="animate-spin" />
               {mode === 'create' ? 'در حال ذخیره...' : 'در حال بروزرسانی...'}
             </span>
           ) : mode === 'create' ? 'ایجاد پروژه' : 'ذخیره تغییرات'}
