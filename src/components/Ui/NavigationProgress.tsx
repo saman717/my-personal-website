@@ -45,9 +45,16 @@ export default function NavigationProgress() {
 
       if (!isInternal || isAnchor || isExternal) return;
 
-      // ✅ با URL API مقایسه دقیق pathname
-      const targetPathname = new URL(href, window.location.origin).pathname;
-      if (targetPathname === window.location.pathname) return; // همون صفحه → skip
+      const normalize = (p: string) => (p.endsWith('/') && p.length > 1 ? p.slice(0, -1) : p);
+      const targetPathname = normalize(new URL(href, window.location.origin).pathname);
+      const currentPathname = normalize(window.location.pathname);
+
+      // Skip if exact same path, or if href has no locale and current has default locale prefix
+      const DEFAULT_LOCALE = 'fa';
+      const isSamePage =
+        targetPathname === currentPathname ||
+        currentPathname === `/${DEFAULT_LOCALE}${targetPathname}`;
+      if (isSamePage) return;
 
       // Start the progress bar
       if (intervalRef.current) clearInterval(intervalRef.current);
