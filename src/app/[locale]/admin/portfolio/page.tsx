@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 export default async function AdminPortfolioPage({
   params,
 }: {
-  params: Promise<{ locale: string }> | { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
   const resolvedParams = await params;
   const locale = resolvedParams.locale;

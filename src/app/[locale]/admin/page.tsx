@@ -61,7 +61,7 @@ const sections = [
 export default function AdminDashboardPage({
   params,
 }: {
-  params: Promise<{ locale: string }> | { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
   // params may be a Promise in Next.js 15 — handle both
   // Note: this is a server component; locale extracted at runtime

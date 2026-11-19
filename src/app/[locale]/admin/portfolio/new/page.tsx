@@ -4,7 +4,7 @@ import ProjectForm from '@/components/admin/portfolio/ProjectForm';
 export default async function NewPortfolioProjectPage({
   params,
 }: {
-  params: Promise<{ locale: string }> | { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
   const resolvedParams = await params;
   const locale = resolvedParams.locale;

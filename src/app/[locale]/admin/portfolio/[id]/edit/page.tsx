@@ -33,7 +33,7 @@ async function dbRetry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
 export default async function EditPortfolioProjectPage({
   params,
 }: {
-  params: Promise<{ locale: string; id: string }> | { locale: string; id: string };
+  params: Promise<{ locale: string; id: string }>;
 }) {
   const resolvedParams = await params;
   const { locale, id } = resolvedParams;

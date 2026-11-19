@@ -5,7 +5,7 @@ import AdminTasksPageContent from "@/components/admin/tasks/AdminTasksPageConten
 export default async function AdminTasksPage({
   params,
 }: {
-  params: Promise<{ locale: string }> | { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
   const resolvedParams = await params;
   const locale = resolvedParams.locale;

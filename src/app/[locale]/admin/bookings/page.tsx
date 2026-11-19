@@ -5,7 +5,7 @@ import AdminBookingsPageContent from "@/components/admin/booking/AdminBookingsPa
 export default async function AdminBookingsPage({
   params,
 }: {
-  params: Promise<{ locale: string }> | { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
   const resolvedParams = await params;
   const locale = resolvedParams.locale;
