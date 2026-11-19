@@ -37,7 +37,6 @@ export default function NavigationProgress() {
       const href = target.getAttribute('href');
       if (!href) return;
 
-      // Only trigger for internal links that are not anchors or external
       const isInternal =
         href.startsWith('/') ||
         href.startsWith(window.location.origin);
@@ -46,9 +45,9 @@ export default function NavigationProgress() {
 
       if (!isInternal || isAnchor || isExternal) return;
 
-      // Don't trigger if already on the same path
-      const targetPath = href.split('?')[0];
-      if (targetPath === window.location.pathname && href === window.location.href) return;
+      // ✅ با URL API مقایسه دقیق pathname
+      const targetPathname = new URL(href, window.location.origin).pathname;
+      if (targetPathname === window.location.pathname) return; // همون صفحه → skip
 
       // Start the progress bar
       if (intervalRef.current) clearInterval(intervalRef.current);
