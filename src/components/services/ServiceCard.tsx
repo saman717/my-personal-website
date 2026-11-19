@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { LuCode2, LuCamera, LuTrendingUp, LuDatabase } from 'react-icons/lu';
+import { LuCode, LuCamera, LuTrendingUp, LuDatabase } from 'react-icons/lu';
 
 interface ServiceCardProps {
   title: string;
@@ -12,7 +12,7 @@ interface ServiceCardProps {
 }
 
 const iconMap: Record<string, React.ReactNode> = {
-  web: <LuCode2    size={20} className="text-emerald-400" />,
+  web: <LuCode    size={20} className="text-emerald-400" />,
   ai:  <LuCamera   size={20} className="text-emerald-400" />,
   seo: <LuTrendingUp size={20} className="text-emerald-400" />,
   db:  <LuDatabase size={20} className="text-emerald-400" />,
