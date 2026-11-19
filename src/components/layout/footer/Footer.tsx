@@ -1,12 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { getDictionary } from '@/lib/translate';
-import GitHubIcon from '../../../../public/icons/Github.svg';
-import Linkdin from '../../../../public/icons/Linkdin.svg';
-import Telegram from '../../../../public/icons/Telegram.svg';
-import Instageram from '../../../../public/icons/Instageram.svg';
-import WhatsApp from '../../../../public/icons/WhatsApp.svg';
-import Bale from '../../../../public/icons/Bale.svg';
+import { SiGithub, SiTelegram, SiInstagram, SiWhatsapp } from 'react-icons/si';
+import { LuMessageSquare, LuLinkedin } from 'react-icons/lu';
 import Image from 'next/image';
 
 // --- Types ---
@@ -36,12 +32,12 @@ const QUICK_LINKS: NavLink[] = [
 ];
 
 const SOCIAL_LINKS: SocialLink[] = [
-    { id: 'github', label: { fa: 'گیت هاب', en: 'GitHub' }, href: 'https://github.com/samankhoshnood', icon: <GitHubIcon className="size-8" /> },
-    { id: 'whatsapp', label: { fa: 'واتس آپ', en: 'WhatsApp' }, href: 'https://wa.me/989935867279', icon: <WhatsApp className="size-8 text-[#25D366]" /> },
-    { id: 'linkedin', label: { fa: 'لینکدین', en: 'LinkedIn' }, href: 'https://www.linkedin.com/in/saman-khoshnoud/', icon: <Linkdin className="size-8 text-blue-700" /> },
-    { id: 'telegram', label: { fa: 'تلگرام', en: 'Telegram' }, href: 'https://t.me/MSkh2112', icon: <Telegram className="size-8 text-[#0088cc]" /> },
-    { id: 'instagram', label: { fa: 'اینستاگرام', en: 'Instagram' }, href: 'https://www.instagram.com/mohamadkhoshnood.10/', icon: <Instageram className="size-8 text-[#E4405F]" /> },
-    { id: 'bale', label: { fa: 'بله', en: 'Bale' }, href: 'https://ble.ir/Mommdd05', icon: <Bale className="size-8 text-[#00BFA5]" /> },
+    { id: 'github',    label: { fa: 'گیت هاب',    en: 'GitHub'    }, href: 'https://github.com/samankhoshnood',              icon: <SiGithub       size={32} /> },
+    { id: 'whatsapp',  label: { fa: 'واتس آپ',    en: 'WhatsApp'  }, href: 'https://wa.me/989935867279',                     icon: <SiWhatsapp     size={32} style={{ color: '#25D366' }} /> },
+    { id: 'linkedin',  label: { fa: 'لینکدین',    en: 'LinkedIn'  }, href: 'https://www.linkedin.com/in/saman-khoshnoud/',   icon: <LuLinkedin     size={32} style={{ color: '#0A66C2' }} /> },
+    { id: 'telegram',  label: { fa: 'تلگرام',     en: 'Telegram'  }, href: 'https://t.me/MSkh2112',                         icon: <SiTelegram     size={32} style={{ color: '#0088cc' }} /> },
+    { id: 'instagram', label: { fa: 'اینستاگرام', en: 'Instagram' }, href: 'https://www.instagram.com/mohamadkhoshnood.10/', icon: <SiInstagram    size={32} style={{ color: '#E4405F' }} /> },
+    { id: 'bale',      label: { fa: 'بله',         en: 'Bale'      }, href: 'https://ble.ir/Mommdd05',                       icon: <LuMessageSquare size={32} style={{ color: '#00BFA5' }} /> },
 ];
 
 export default async function Footer({ locale }: FooterProps) {

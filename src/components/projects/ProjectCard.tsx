@@ -1,32 +1,43 @@
 import Link from "next/link";
+import Image from "next/image";
 import ProjectTag from "./ProjectTag";
 
 interface ProjectCardProps {
   title: string;
   description: string;
   tags: string[];
-  imagePlaceholder?: string;
+  image?: { url: string; alt: string | null } | null;
   projectLink?: string;
-  viewProjectLabel: string; // 🌟 پراپ جدید برای دریافت متن دکمه
+  viewProjectLabel: string;
 }
 
-export default function ProjectCard({ 
-  title, 
-  description, 
-  tags, 
-  imagePlaceholder,
+export default function ProjectCard({
+  title,
+  description,
+  tags,
+  image,
   projectLink = "#",
   viewProjectLabel,
 }: ProjectCardProps) {
   return (
     <div className="group bg-[#1E1E24] rounded-2xl p-3 border border-white/5 hover:border-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/30">
-      {/* تصویر - کوچیک‌تر */}
       <div className="relative w-full aspect-video bg-[#181825] rounded-xl overflow-hidden mb-4">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-white text-lg font-bold opacity-50 group-hover:opacity-70 transition-opacity">
-            {imagePlaceholder || title}
-          </span>
-        </div>
+        {image?.url ? (
+          <Image
+            src={image.url}
+            alt={image.alt ?? title}
+            fill
+            unoptimized
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-white text-lg font-bold opacity-50 group-hover:opacity-70 transition-opacity">
+              {title}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* عنوان و توضیحات - فشرده‌تر */}

@@ -1,4 +1,5 @@
 import React from "react";
+import { LuCheck } from 'react-icons/lu';
 import { t } from "@/lib/translate";
 
 interface TechPartnerSectionProps {
@@ -37,9 +38,7 @@ export default async function TechPartnerSection({ locale }: TechPartnerSectionP
           {[f1, f2, f3]?.map((feature, i) => (
             <div key={i} className="flex items-start gap-3">
               <div className="shrink-0 w-4 h-4 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mt-0.5">
-                <svg className="w-2.5 h-2.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
+                <LuCheck size={10} className="text-emerald-400" strokeWidth={3} />
               </div>
               <span className="text-xs text-gray-300 font-medium leading-tight">{feature}</span>
             </div>

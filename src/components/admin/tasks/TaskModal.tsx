@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { LuCheck } from 'react-icons/lu';
 import { MASTER_TIME_SLOTS } from "@/lib/calendar.config";
 import { useTaskForm } from "@/hooks/useTaskForm";
 import { Task } from "@/types/task";
@@ -195,9 +196,7 @@ export default function TaskModal(props: TaskModalProps) {
                     onChange={(e) => setSaveAsTemplate(e.target.checked)}
                     className="sr-only"
                   />
-                  <svg className={`w-3.5 h-3.5 text-black transition-all duration-200 ${saveAsTemplate && !selectedTemplateId ? "opacity-100 scale-100" : "opacity-0 scale-50"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
+                  <LuCheck size={14} strokeWidth={3} className={`text-black transition-all duration-200 ${saveAsTemplate && !selectedTemplateId ? "opacity-100 scale-100" : "opacity-0 scale-50"}`} />
                 </div>
                 <div>
                   <span className="text-[11px] font-bold text-emerald-400 block select-none">{labels?.save_template_title || "ذخیره به عنوان قالب"}</span>

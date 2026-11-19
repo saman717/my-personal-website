@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
+import { LuChevronLeft, LuChevronRight } from 'react-icons/lu';
 import { getMonthAvailabilityAction } from "@/actions/booking";
 
 interface BookingCalendarProps {
@@ -131,17 +132,13 @@ export default function BookingCalendar({ locale, selectedDate, onDateChange, la
       {/* هدر ناوبری ماه */}
       <div className="flex justify-between items-center bg-[#111118]/50 px-4 py-2 rounded-xl border border-white/[0.02]">
         <button onClick={handlePrevMonth} type="button" className="text-gray-400 hover:text-white p-1.5 hover:bg-white/5 rounded-lg transition-all transform hover:scale-105">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d={isRTL ? "M9 5l7 7-7 7" : "M15 19l-7-7 7-7"} />
-          </svg>
+          {isRTL ? <LuChevronRight size={16} /> : <LuChevronLeft size={16} />}
         </button>
 
         <span className="text-sm font-bold text-white tracking-wide">{monthTitle}</span>
 
         <button onClick={handleNextMonth} type="button" className="text-gray-400 hover:text-white p-1.5 hover:bg-white/5 rounded-lg transition-all transform hover:scale-105">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d={isRTL ? "M15 19l-7-7 7-7" : "M9 5l7 7-7 7"} />
-          </svg>
+          {isRTL ? <LuChevronLeft size={16} /> : <LuChevronRight size={16} />}
         </button>
       </div>
 

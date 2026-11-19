@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
+import { LuMenu, LuLogOut, LuLoader2 } from 'react-icons/lu';
 import { TimeDisplay } from "@/hooks/useTimeHeader";
 import LanguageSwitcher from "@/components/layout/Header/LanguageSwitcher";
 
@@ -34,9 +35,7 @@ export default function Header({ locale, onMenuToggle, labels }: HeaderProps) {
           onClick={onMenuToggle}
           className="md:hidden p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
         >
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-          </svg>
+          <LuMenu size={24} />
         </button>
         <LanguageSwitcher />
       </div>
@@ -64,18 +63,7 @@ export default function Header({ locale, onMenuToggle, labels }: HeaderProps) {
           title="خروج از پنل"
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-gray-500 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all disabled:opacity-40"
         >
-          {isPending ? (
-            <svg className="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-            </svg>
-          ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-              <polyline points="16 17 21 12 16 7"/>
-              <line x1="21" y1="12" x2="9" y2="12"/>
-            </svg>
-          )}
+          {isPending ? <LuLoader2 size={14} className="animate-spin" /> : <LuLogOut size={14} />}
           <span className="hidden sm:inline">خروج</span>
         </button>
 

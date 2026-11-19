@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
+import { LuLayers, LuX, LuExternalLink, LuPencil, LuTrash2 } from 'react-icons/lu';
 import {
   getTechnologies,
   createTechnology,
@@ -82,12 +83,7 @@ export default function TechnologiesManagerPanel() {
         className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-gray-200 text-sm transition-all duration-200 border border-white/5"
         title="مدیریت تکنولوژی‌ها"
       >
-        {/* stack layers icon */}
-        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-          <path d="M2 17l10 5 10-5"/>
-          <path d="M2 12l10 5 10-5"/>
-        </svg>
+        <LuLayers size={16} />
         <span className="hidden sm:inline text-xs font-medium">تکنولوژی‌ها</span>
       </button>
 
@@ -125,9 +121,7 @@ export default function TechnologiesManagerPanel() {
                 onClick={handleClose}
                 className="p-1.5 rounded-lg hover:bg-white/5 text-gray-500 hover:text-gray-300 transition-colors"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                </svg>
+                <LuX size={16} />
               </button>
             </div>
           </div>
@@ -194,9 +188,7 @@ export default function TechnologiesManagerPanel() {
               </div>
             ) : technologies.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 gap-2 text-gray-600">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 opacity-30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-                </svg>
+                <LuLayers size={32} className="opacity-30" />
                 <p className="text-sm">هیچ تکنولوژی‌ای ثبت نشده</p>
               </div>
             ) : (
@@ -276,11 +268,7 @@ export default function TechnologiesManagerPanel() {
                               className="text-xs text-blue-400/60 hover:text-blue-400 transition-colors"
                               title={tech.website}
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                                <polyline points="15 3 21 3 21 9"/>
-                                <line x1="10" y1="14" x2="21" y2="3"/>
-                              </svg>
+                              <LuExternalLink size={12} />
                             </a>
                           )}
                         </div>
@@ -291,10 +279,7 @@ export default function TechnologiesManagerPanel() {
                           className="p-1.5 rounded-lg hover:bg-white/5 text-gray-600 hover:text-gray-300 transition-colors"
                           title="ویرایش"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                          </svg>
+                          <LuPencil size={14} />
                         </button>
                         <button
                           onClick={() => handleDelete(tech.id, tech.name)}
@@ -302,10 +287,7 @@ export default function TechnologiesManagerPanel() {
                           className="p-1.5 rounded-lg hover:bg-red-500/10 text-gray-600 hover:text-red-400 disabled:opacity-40 transition-colors"
                           title="حذف"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <polyline points="3 6 5 6 21 6"/>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-                          </svg>
+                          <LuTrash2 size={14} />
                         </button>
                       </div>
                     </div>

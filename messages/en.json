@@ -14,7 +14,16 @@
     "subtitle": "Full Stack Developer",
     "description": "I code, design, and automate.\nSpecialist in creating modern web experiences",
     "cta_projects": "View Projects",
-    "cta_contact": "Contact Me"
+    "cta_contact": "Contact Me",
+    "eyebrow": "Frontend Developer · Industrial Software",
+    "headline_1": "Building systems that",
+    "headline_2": "actually ship",
+    "sub": "I build production-ready web apps with Next.js, TypeScript, and React. On the industrial side, I craft Python and PyQt5 desktop tools that run on factory floors.",
+    "cta_primary": "View Projects",
+    "cta_secondary": "Download CV",
+    "available": "Available for remote",
+    "projects_count": "Projects +",
+    "client_label": "NAPCO"
   },
   "skills": {
     "title": "My Skills",
@@ -26,10 +35,24 @@
       "learning": "Learning",
       "proficient": "Proficient",
       "expert": "Expert"
-    }
+    },
+    "eyebrow": "EXPERTISE",
+    "subtitle": "Two domains, one developer.",
+    "web_title": "Web Development",
+    "web_desc": "Full-stack web apps with modern tooling — from database schema to production UI.",
+    "industrial_title": "Industrial Software",
+    "industrial_desc": "Desktop and embedded tools for factory floors — real-time data, hardware protocols, and reliability.",
+    "approach_ship_first": "Ship-first",
+    "approach_ship_first_desc": "Build in public, iterate fast.",
+    "approach_full_delivery": "Full delivery",
+    "approach_full_delivery_desc": "From schema to UI, end to end.",
+    "approach_domain_first": "Domain-first",
+    "approach_domain_first_desc": "Industrial constraints shape the code."
   },
   "projects": {
     "title": "My Projects",
+    "section_title": "Projects",
+    "view_all": "View all projects",
     "view_more": "View More",
     "view_project": "View Project",
     "items": [
@@ -58,33 +81,6 @@
     "item_3_year": "2025",
     "item_3_title": "Expanding Skills",
     "item_3_tech": "React • Node.js • PLC (Delta)"
-  },
-  "contact": {
-    "title": "Contact Me",
-    "form": {
-      "fullName": "Full Name",
-      "phone": "Phone Number",
-      "email": "Email Address",
-      "message": "Message",
-      "submit": "Send Request",
-      "submitting": "Sending...",
-      "placeholders": {
-        "fullName": "Enter your name",
-        "phone": "Enter your phone",
-        "email": "Enter your email",
-        "message": "Type your message here..."
-      },
-      "errors": {
-        "fullName": "Please enter your name",
-        "phone": "Invalid phone number",
-        "email": "Invalid email format",
-        "message": "Message cannot be empty"
-      }
-    },
-    "info": {
-      "heading": "Let's work together",
-      "description": "Feel free to reach out for collaborations or just to say hi."
-    }
   },
   "booking": {
     "title": "Book a Meeting",
@@ -474,17 +470,24 @@
       "button": "Book a Session in My Custom System"
     },
     "form": {
+      "fullName": "Full Name",
+      "phone": "Phone Number",
+      "email": "Email Address",
+      "message": "Message",
+      "submit": "Send Message",
+      "submitting": "Sending...",
       "placeholders": {
-        "fullName": "Full Name",
-        "email": "Email Address",
-        "message": "Your Message..."
+        "fullName": "Enter your full name",
+        "phone": "Enter your phone number",
+        "email": "Enter your email address",
+        "message": "Type your message here..."
       },
       "errors": {
-        "fullName": "Full name is required",
-        "email": "Valid email is required"
-      },
-      "submit": "Send Message",
-      "sending": "Sending..."
+        "fullName": "Please enter your name",
+        "phone": "Invalid phone number",
+        "email": "Invalid email format",
+        "message": "Message cannot be empty"
+      }
     }
   },
   "booking": {
@@ -563,6 +566,20 @@
     "wip_badge": "In Development",
     "featured": "Featured Project",
     "tech_stack": "Tech Stack",
+    "detail": {
+      "back": "← Portfolio",
+      "links": "Links",
+      "role": "Role",
+      "platform": "Platform",
+      "category": "Category",
+      "status_label": "Status",
+      "challenge": "Challenge",
+      "solution": "Solution",
+      "results": "Results",
+      "gallery": "Gallery",
+      "no_content": "No content yet",
+      "last_updated": "Last updated:"
+    },
     "cta": {
       "title": "Want to build something together?",
       "description": "If you have an idea you want turned into reality, let's talk.",

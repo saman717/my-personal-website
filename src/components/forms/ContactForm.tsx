@@ -162,12 +162,13 @@ export const ContactForm: React.FC<ContactFormProps> = ({
     >
       {/* FULL NAME */}
       <div className="space-y-2">
-        <label className={labelAlignmentClasses}>
+        <label htmlFor="contact-fullName" className={labelAlignmentClasses}>
           {labels.fullName} :
         </label>
 
         <div className={inputContainerClasses}>
           <input
+            id="contact-fullName"
             type="text"
             autoComplete="off"
             placeholder={labels.placeholders.fullName}
@@ -187,12 +188,13 @@ export const ContactForm: React.FC<ContactFormProps> = ({
 
       {/* PHONE */}
       <div className="space-y-2">
-        <label className={labelAlignmentClasses}>
+        <label htmlFor="contact-phone" className={labelAlignmentClasses}>
           {labels.phone} :
         </label>
 
         <div className={inputContainerClasses}>
           <input
+            id="contact-phone"
             type="text"
             autoComplete="off"
             placeholder={labels.placeholders.phone}
@@ -216,12 +218,13 @@ export const ContactForm: React.FC<ContactFormProps> = ({
 
       {/* EMAIL */}
       <div className="space-y-2">
-        <label className={labelAlignmentClasses}>
+        <label htmlFor="contact-email" className={labelAlignmentClasses}>
           {labels.email} :
         </label>
 
         <div className={inputContainerClasses}>
           <input
+            id="contact-email"
             type="email"
             autoComplete="off"
             placeholder={labels.placeholders.email}
@@ -246,12 +249,13 @@ export const ContactForm: React.FC<ContactFormProps> = ({
 
       {/* MESSAGE */}
       <div className="space-y-2">
-        <label className={labelAlignmentClasses}>
+        <label htmlFor="contact-message" className={labelAlignmentClasses}>
           {labels.message} :
         </label>
 
         <div className={`${inputContainerClasses} py-3`}>
           <textarea
+            id="contact-message"
             rows={4}
             placeholder={labels.placeholders.message}
             {...register("message", {
